@@ -262,11 +262,11 @@ local function RenderSystem(system)
 					playerNodeData.Part.Parent = system.Model
 					existingPlayerNode = playerNodeData
 				end
-				local phaseValue = currentTime % 6.283185307179586
+				local phaseValue = currentTime % math.tau
 				local Part = existingPlayerNode.Part
 				local centerCFrame = existingPlayerNode.c
 				Part.Size = Vector3.new(1, 1, 1) * ((math.cos(8 * phaseValue) * 0.5 + 0.5) * 0.5 + 0.3) * 64 * Scale
-				Part.CFrame = system.Center * (centerCFrame + centerCFrame.p * (Scale - 1)) * CFrame.Angles(0, 4 * phaseValue, 0) * CFrame.Angles(0.7853981633974483, 0, 0.7853981633974483)
+				Part.CFrame = system.Center * (centerCFrame + centerCFrame.p * (Scale - 1)) * CFrame.Angles(0, 4 * phaseValue, 0) * CFrame.Angles(math.pi / 4, 0, math.pi / 4)
 				local TeamValue = player:FindFirstChild("TeamValue")
 				if TeamValue then
 					local isPoliceTeam = TeamValue.Value == "Police"

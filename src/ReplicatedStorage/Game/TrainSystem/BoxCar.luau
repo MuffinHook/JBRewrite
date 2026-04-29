@@ -31,7 +31,7 @@ return {
 		Joint.Weld(Skeleton.VaultHinge, Model.Base)
 		boxCar.VaultMotor = Joint.BlankMotor(Skeleton.Vault.Hinge, Skeleton.VaultHinge)
 		Skeleton.VaultHinge.Anchored = false
-		boxCar.VaultOpenC1 = CFrame.Angles(0, -1.5707963267948966, 0)
+		boxCar.VaultOpenC1 = CFrame.Angles(0, -math.pi / 2, 0)
 		return Default.MakeCar(boxCar)
 	end,
 	MoveCar = function(boxCar, config, p3, p4)

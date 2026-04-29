@@ -50,7 +50,7 @@ function PistolClass.ShootSound(self, isSilenced)
 				Pitch = 1
 			})
 		end
-		delay(0.1, function()
+		task.delay(0.1, function()
 			Audio.ObjectLocal(self.Tip, self.Config.Sound.gun_pistol_slide_fast_01, {
 				Volume = 0.3,
 				Pitch = 1 + math.random() * 0.1 - 0.05
@@ -68,10 +68,10 @@ function PistolClass.ReloadRefillAmmoSound(self)
 	Audio.ObjectLocal(self.Tip, self.Config.Sound.gun_pistol_insert_mag_01, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.4)
+	task.wait(0.4)
 	Audio.ObjectLocal(self.Tip, self.Config.Sound.gun_pistol_slide_fast_01, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.1)
+	task.wait(0.1)
 end
 return PistolClass

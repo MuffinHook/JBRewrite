@@ -106,7 +106,7 @@ function KeypadComponent.render(component)
 		AnchorPoint = component.props.anchorPoint
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = 0.8333333333333333
+			AspectRatio = 5/6
 		}),
 		Close = createElement("ImageButton", {
 			BackgroundTransparency = 1,
@@ -124,8 +124,8 @@ function KeypadComponent.render(component)
 		}),
 		Code = createElement("Frame", {
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0.08333333333333333, 0),
-			Position = UDim2.new(0, 0, 0.9166666666666666, 0)
+			Size = UDim2.new(1, 0, 1/12, 0),
+			Position = UDim2.new(0, 0, 11/12, 0)
 		}, {
 			Title = createElement("TextLabel", {
 				BackgroundTransparency = 1,
@@ -175,8 +175,8 @@ function KeypadComponent.render(component)
 		}),
 		Buttons = createElement("Frame", {
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 0.8333333333333333, 0),
-			Position = UDim2.new(0, 0, 0.08333333333333333, 0)
+			Size = UDim2.new(1, 0, 5/6, 0),
+			Position = UDim2.new(0, 0, 1/12, 0)
 		}, {
 			Grid = Roact.createElement(Grid, {
 				aspectRatio = 1,

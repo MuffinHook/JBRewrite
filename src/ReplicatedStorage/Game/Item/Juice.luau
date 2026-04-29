@@ -69,7 +69,7 @@ function Juice.InputBegan(juiceItem, inputObject, p3)
 		Audio.ObjectLocal(juiceItem.Character.PrimaryPart, 7209853095, {
 			Volume = 0.3
 		})
-		delay(0.3, function()
+		task.delay(0.3, function()
 			juiceItem.SpringItemOffset:SetTarget(juiceItem.Config.Motion.Hip.Springs.ItemOffset)
 			juiceItem.SpringItemRotation:SetTarget(juiceItem.Config.Motion.Hip.Springs.ItemRotation)
 			if juiceItem.Local then

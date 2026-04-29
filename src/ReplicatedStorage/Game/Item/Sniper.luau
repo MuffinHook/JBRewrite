@@ -97,10 +97,10 @@ function Sniper.ReloadRefillAmmoSound(self)
 	Audio.ObjectLocal(self.Tip, self.Config.Sound.mag_in, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.5)
+	task.wait(0.5)
 	Audio.ObjectLocal(self.Tip, self.Config.Sound.cock, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.2)
+	task.wait(0.2)
 end
 return Sniper

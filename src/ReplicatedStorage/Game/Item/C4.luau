@@ -30,10 +30,11 @@ local function getNumActiveC4(player)
 	end
 	return count
 end
-local function randomVector()
+local function randomUnitVector()
 	local randX = math.random() * 2 - 1
 	local randY = math.random() * 2 - 1
-	return Vector3.new(randX, randY, math.random() * 2 - 1).Unit
+	local randZ = math.random() * 2 - 1 
+	return Vector3.new(randX, randY, randZ).Unit
 end
 local eventObject = nil
 local C4 = {
@@ -78,7 +79,7 @@ end
 function C4.BulletEmitterOnLocalHitPlayer(self) end
 function C4.ShootBegin(self, inputState)
 	tick()
-	local c4Instance, launchPosition, mousePosition, gravityValue, projectileVelocity, _, rotationVelocityBase, randomRotX, randomRotY, randomRotZ
+	local c4Instance, launchPosition, mousePosition, gravityValue, projectileVelocity, _, rotationVelocityBase
 	if not self.Local then
 		if self.Local then
 			if getNumActiveC4(self.Player) >= 2 then
@@ -105,10 +106,7 @@ function C4.ShootBegin(self, inputState)
 			c4Instance._obj:SetPrimaryPartCFrame(CFrame.new(launchPosition, launchPosition + projectileVelocity))
 			c4Instance:SetVelocity(projectileVelocity)
 			rotationVelocityBase = -0.25 * projectileVelocity:Cross(Vector3.new(0, 1, 0))
-			randomRotX = math.random() * 2 - 1
-			randomRotY = math.random() * 2 - 1
-			randomRotZ = math.random() * 2 - 1
-			c4Instance:SetRotVelocity(rotationVelocityBase + Vector3.new(randomRotX, randomRotY, randomRotZ).Unit * 5)
+			c4Instance:SetRotVelocity(rotationVelocityBase + randomUnitVector() * 5)
 			task.spawn(function()
 				c4Instance:ListenForAttach()
 			end)
@@ -135,7 +133,7 @@ function C4.ShootBegin(self, inputState)
 				self.SpringItemOffset:SetTarget(self.Config.Motion.Raise.Springs.ItemOffset)
 				self.SpringItemRotation:SetTarget(self.Config.Motion.Raise.Springs.ItemRotation)
 				self.SpringNeckRotation:SetTarget(self.Config.Motion.Raise.Springs.NeckRotation)
-				delay(0.2, function()
+				task.delay(0.2, function()
 					self.SpringItemOffset:SetTarget(self.Config.Motion.Hip.Springs.ItemOffset)
 					self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
 					self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
@@ -167,10 +165,7 @@ function C4.ShootBegin(self, inputState)
 					c4Instance._obj:SetPrimaryPartCFrame(CFrame.new(launchPosition, launchPosition + projectileVelocity))
 					c4Instance:SetVelocity(projectileVelocity)
 					rotationVelocityBase = -0.25 * projectileVelocity:Cross(Vector3.new(0, 1, 0))
-					randomRotX = math.random() * 2 - 1
-					randomRotY = math.random() * 2 - 1
-					randomRotZ = math.random() * 2 - 1
-					c4Instance:SetRotVelocity(rotationVelocityBase + Vector3.new(randomRotX, randomRotY, randomRotZ).Unit * 5)
+					c4Instance:SetRotVelocity(rotationVelocityBase + randomUnitVector() * 5)
 					task.spawn(function()
 						c4Instance:ListenForAttach()
 					end)
@@ -184,6 +179,7 @@ function C4.ShootBegin(self, inputState)
 			break
 		end
 	end
+	return
 end
 function C4.ShootEnd(self, inputState)
 	if self.Local then

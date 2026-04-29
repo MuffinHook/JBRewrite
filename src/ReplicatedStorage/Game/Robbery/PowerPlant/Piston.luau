@@ -37,7 +37,7 @@ function Piston.new(parentPart)
 				MaxDistance = 96
 			})
 			isSpringIdle = false
-			delay(1, function()
+			task.delay(1, function()
 				pistonSpring.Damp = 0.9
 				pistonSpring.Freq = 10
 				pistonSpring:SetTarget(0)
@@ -64,7 +64,7 @@ function Piston.SlamPlayer(self, player)
 	local Humanoid = player.Character.Humanoid
 	Humanoid.BodyHeightScale.Value = 0.3
 	Audio.ObjectLocal(Humanoid.RootPart, 5333889062)
-	delay(4, function()
+	task.delay(4, function()
 		Humanoid.BodyHeightScale.Value = 1
 		Audio.ObjectLocal(Humanoid.RootPart, 5333889401)
 	end)

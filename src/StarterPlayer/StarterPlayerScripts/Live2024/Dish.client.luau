@@ -2,6 +2,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 local RunConsts = require(ReplicatedStorage.App.RunConsts)
 local isMAIN_WORLD_NAME = require(ReplicatedStorage.App.RunUtils).getWorld() == RunConsts.MAIN_WORLD_NAME
+
+local v1
+local v2
+local laserVisual
+local sphereVisual
+local audioManager
+local doorPart
+local playCommandSequence
+
 local function _(commands, callback)
 	for i = 1, #commands do
 		local commandCode = commands[i]

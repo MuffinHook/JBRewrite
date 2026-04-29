@@ -37,7 +37,7 @@ local function Ease_InOutQuad(progress)
 	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
 local function Ease_InOutSine(progress)
-	return (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
+	return (math.sin(math.pi * progress - math.pi / 2) + 1) * 0.5
 end
 local function HideModel(model)
 	for i, v in ipairs(model:GetChildren()) do
@@ -110,10 +110,10 @@ function Lever.SetAngle(self, angle)
 	self._leverMotor.C1 = self._leverMotor.C0:Inverse() * CFrame.new(0, 0, self.Length * 0.5) * CFrame.Angles(angle, 0, 0) * CFrame.new(0, 0, -self.Length * 0.5) * self._leverMotor.C0
 end
 function Lever.Reset(self)
-	self:SetAngle(0.7853981633974483)
+	self:SetAngle(math.pi / 4)
 end
 function Lever.Pull(self)
-	self:SetAngle(-0.7853981633974483)
+	self:SetAngle(-math.pi / 4)
 end
 function Lever.Destroy(self)
 	self.OnSuccess:Destroy()
@@ -188,7 +188,7 @@ function CargoPlane.new(bornAt)
 			MaxPlaybackTime = 0.6
 		})
 		planeModel.ControlPanel.Light.Color = Color3.new(0/255, 255/255, 0/255)
-		delay(0.1, function()
+		task.delay(0.1, function()
 			planeModel.ControlPanel.Light.Color = Color3.fromRGB(196, 40, 28)
 		end)
 		RemoteEvent:FireServer("wpn1ghxm")
@@ -203,7 +203,7 @@ function CargoPlane.new(bornAt)
 			MaxPlaybackTime = 0.6
 		})
 		planeModel.ControlPanel.Light.Color = Color3.new(0/255, 0/255, 0/255)
-		delay(0.1, function()
+		task.delay(0.1, function()
 			planeModel.ControlPanel.Light.Color = Color3.fromRGB(196, 40, 28)
 		end)
 	end)
@@ -580,7 +580,7 @@ function CargoPlane.SeqEnter(self, progress)
 		Audio.FadeTo(self.SoundEngineFlying, 0, 1)
 		Audio.FadeTo(self.SoundEngineIdle, 0.6, 1)
 	end
-	local eased = (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
+	local eased = (math.sin(math.pi * progress - math.pi / 2) + 1) * 0.5
 	local Model = self.Model
 	local PathEnter = self.PathEnter
 	local pos, tangent = PathEnter:GetWorldPositionAt(PathEnter.ApproxTotalLength * eased)
@@ -597,7 +597,7 @@ function CargoPlane.SeqLeave(self, progress)
 	if progress > 0.2 and not self.CratesEnabled then
 		self:EnableCrates()
 	end
-	local eased = (math.sin(math.pi * progress - 1.5707963267948966) + 1) * 0.5
+	local eased = (math.sin(math.pi * progress - math.pi / 2) + 1) * 0.5
 	local Model = self.Model
 	local PathLeave = self.PathLeave
 	local pos, tangent = PathLeave:GetWorldPositionAt(PathLeave.ApproxTotalLength * eased)
@@ -684,7 +684,6 @@ return {
 	Init = function(initConfig)
 		local eventManager = initConfig.em
 		RemoteEvent = initConfig.Event
-		em = eventManager
 		Team = initConfig.Team
 		local ScreenGui = initConfig.ScreenGui
 		local rng = Random.new()

@@ -286,7 +286,7 @@ return function()
  end, nil, nil, errorReporter)
  store.changed:connect(function(newState, oldState)
  changedEventInvokeCount = changedEventInvokeCount + 1
- wait()
+ task.wait()
  changedEventCompleteCount = changedEventCompleteCount + 1
  end)
  store:dispatch({

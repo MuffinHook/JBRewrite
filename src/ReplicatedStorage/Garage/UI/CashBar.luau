@@ -56,7 +56,7 @@ function CashBar.render(props)
 			BackgroundColor3 = Color3.new(0.1, 0.1, 0.1),
 			Size = UDim2.new(1, 0, 0.8, 0),
 			AnchorPoint = Vector2.new(1, 0.5),
-			Position = UDim2.new(1 - 0.12499999999999997 / (displayAspectRatio * 5 / 7), 0, 0.5, 0),
+			Position = UDim2.new(1 - 1/8 / (displayAspectRatio * 5 / 7), 0, 0.5, 0),
 			ZIndex = 5,
 			[Roact.Event.Activated] = props.props.promptCashPurchase
 		}, {

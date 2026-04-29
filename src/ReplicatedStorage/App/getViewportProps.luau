@@ -9,7 +9,7 @@ local SAFE_DATA = require(ReplicatedStorage.Safes.SafesConsts).SAFE_DATA
 local ConsumablesData = require(ReplicatedStorage.Consumables.ConsumablesData)
 local function updateVehicleCamera(model, boundingBox)
 	local animationTime = os.clock() / 2
-	model.CFrame = CFrame.Angles(0, animationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(animationTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBox.BoundingBox.Size.Magnitude * 0.8)
+	model.CFrame = CFrame.Angles(0, animationTime % math.tau, 0) * CFrame.Angles(math.sin(animationTime * 0.5) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, boundingBox.BoundingBox.Size.Magnitude * 0.8)
 end
 local function getVehicleDataForMake(make)
 	for i, vehicleDataEntry in ipairs(VehicleData) do

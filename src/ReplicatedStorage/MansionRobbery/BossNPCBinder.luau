@@ -182,7 +182,7 @@ function BossNPC.DisplayAttackIndicator(self, maidContainer)
 					if Character then
 						if Character:FindFirstChild("UpperTorso") then
 							local playerBasePosition = Character.PrimaryPart.Position - Vector3.new(0, Character.Humanoid.HipHeight + Character.PrimaryPart.Size.Y / 2, 0)
-							local rotationAngle = 6.283185307179586 * (os.clock() % 2) / 2
+							local rotationAngle = math.tau * (os.clock() % 2) / 2
 							indicatorPart.CFrame = CFrame.new(playerBasePosition) * CFrame.Angles(0, rotationAngle, 0)
 							indicatorPart.Decal.Transparency = math.min(0.9, 1 - (math.cos((os.clock() - indicatorStartTime) * 6) + 1) * 2 / 3)
 						else

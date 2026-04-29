@@ -114,7 +114,7 @@ function JoinOrCreateComponent.render(self)
 		Title = createElement(PaddedContainer, {
 			backgroundColor = Color3.new(51/255, 51/255, 51/255),
 			backgroundTransparency = 0,
-			size = UDim2.new(1, 0, 0.16666666666666666, 0),
+			size = UDim2.new(1, 0, 1/6, 0),
 			paddingLeft = 0,
 			paddingRight = 0,
 			paddingTop = 0,
@@ -146,8 +146,8 @@ function JoinOrCreateComponent.render(self)
 	local bodyContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 1,
-		size = UDim2.new(1, 0, 0.7222222222222223, 0),
-		position = UDim2.new(0, 0, 0.16666666666666666, 0),
+		size = UDim2.new(1, 0, 13/18, 0),
+		position = UDim2.new(0, 0, 1/6, 0),
 		paddingLeft = 0,
 		paddingRight = 0,
 		paddingTop = 0.5,
@@ -456,8 +456,8 @@ function JoinOrCreateComponent.render(self)
 	mainLayoutChildren.Bottom = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		size = UDim2.new(1, 0, 0.1111111111111111, 0),
-		position = UDim2.new(0, 0, 0.8888888888888888, 0),
+		size = UDim2.new(1, 0, 1/9, 0),
+		position = UDim2.new(0, 0, 8/9, 0),
 		paddingLeft = 0,
 		paddingRight = 0,
 		paddingTop = 0.5,

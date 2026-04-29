@@ -33,7 +33,7 @@ function PlasmaGun.UpdateZap(self, zapConfig)
 	local elapsedTime = tick() - zapConfig.BornAt
 	local fireFreqCapped = math.min(1 / self.Config.FireFreq, 0.1)
 	local totalSegments = math.ceil((Target - Origin).Magnitude / zapConfig.PerDistance)
-	local progress = 0.3333333333333333 + 0.6666666666666666 * elapsedTime / fireFreqCapped
+	local progress = 1/3 + 2/3 * elapsedTime / fireFreqCapped
 	local currentSegmentIndex = math.ceil(progress * totalSegments)
 	local LastPositionIndex = zapConfig.LastPositionIndex
 	for i = LastPositionIndex, currentSegmentIndex do

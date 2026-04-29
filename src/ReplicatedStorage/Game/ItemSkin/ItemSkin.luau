@@ -5,11 +5,11 @@ require(ReplicatedStorage.Inventory.InventoryItemSystem)
 local InventoryItemUtils = require(ReplicatedStorage.Inventory.InventoryItemUtils)
 local ItemSystem = require(ReplicatedStorage.Game.ItemSystem.ItemSystem)
 local uiModule = nil
-local t = {}
-function t.Init(serverEvent)
-	local serverEvent = serverEvent.Event
+local t = { ItemSkinsOwned = nil }
+function t.Init(em)
+	local serverEvent = em.Event
 	uiModule = require(ReplicatedStorage.Game.ItemSkin.UI.UI)
-	function serverEvent.em.efbs1qej(skinData)
+	function em.efbs1qej(skinData)
 		assert(skinData)
 		t.ItemSkinsOwned = skinData
 		uiModule.UpdateOwned()

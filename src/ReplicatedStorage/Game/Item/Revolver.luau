@@ -35,7 +35,7 @@ end
 function Revolver.UpdateItemSprings(itemProperties)
 	Gun.UpdateItemSprings(itemProperties)
 	itemProperties.CylinderPosition = itemProperties.SpringCylinder:Update()
-	itemProperties.CylinderTotalSpin = (itemProperties.CylinderTotalSpin + itemProperties.SpringCylinderSpin:Update()) % 6.283185307179586
+	itemProperties.CylinderTotalSpin = (itemProperties.CylinderTotalSpin + itemProperties.SpringCylinderSpin:Update()) % math.tau
 end
 function Revolver.UpdateItemJoints(itemProperties)
 	Gun.UpdateItemJoints(itemProperties)
@@ -47,7 +47,7 @@ function Revolver.ShootSound(itemProperties, isRemote)
 			Pitch = 1,
 			Volume = 0.6
 		})
-		delay(0.1, function()
+		task.delay(0.1, function()
 			Audio.ObjectLocal(itemProperties.Tip, itemProperties.Config.Sound.bullet_case, {
 				Volume = 0.4,
 				Pitch = 1 + math.random() * 0.1 - 0.05
@@ -68,10 +68,10 @@ function Revolver.ReloadRefillAmmoSound(itemProperties)
 	itemProperties.SpringCylinderSpin:Accelerate(60)
 	for i = 1, 4 do
 		Audio.ObjectLocal(itemProperties.Tip, itemProperties.Config.Sound.bullet_insert)
-		wait(0.2)
+		task.wait(0.2)
 	end
 	Audio.ObjectLocal(itemProperties.Tip, itemProperties.Config.Sound.reload_close)
-	wait(0.2)
+	task.wait(0.2)
 	Audio.ObjectLocal(itemProperties.Tip, itemProperties.Config.Sound.cylinder_spin)
 	itemProperties.SpringCylinder:SetTarget(Vector3.new(0, 0, 0))
 end

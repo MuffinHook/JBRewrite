@@ -2,6 +2,11 @@ game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 game:GetService("RunService")
 require(ReplicatedStorage.App.RunUtils)
+local isPhaseUpdateEnabled = false
+local balloonConfigs = {}
+local timingConfig = {}
+local balloonConfigsByInstance = {}
+local balloonCount = {}
 local function toggleBalloonEmitters(balloon, isEnabled)
 	for index, part in balloon.Part:GetChildren() do
 		local ParticleEmitter = part:FindFirstChildOfClass("ParticleEmitter")

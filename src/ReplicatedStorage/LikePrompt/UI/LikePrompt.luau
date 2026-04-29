@@ -37,7 +37,7 @@ function LikePrompt.render(self)
 		local contentChildren = {
 			TitleContainer = createElement(PaddedContainer, {
 				backgroundTransparency = 1,
-				size = UDim2.fromScale(0.7944444444444444, 1),
+				size = UDim2.fromScale(0.794444, 1),
 				paddingTop = 0,
 				paddingBottom = 0,
 				paddingLeft = 1,
@@ -57,7 +57,7 @@ function LikePrompt.render(self)
 			ButtonContainer = createElement(PaddedContainer, {
 				backgroundTransparency = 1,
 				size = UDim2.fromScale(0.15, 1),
-				position = UDim2.fromScale(0.7944444444444444, 0),
+				position = UDim2.fromScale(0.794444, 0),
 				paddingTop = 0,
 				paddingBottom = 0,
 				paddingLeft = 0.5,
@@ -94,8 +94,8 @@ function LikePrompt.render(self)
 		}
 		local countdownFrameProps = {
 			BackgroundTransparency = 1,
-			Size = UDim2.fromScale(0.05555555555555555, 1),
-			Position = UDim2.fromScale(0.9444444444444444, 0)
+			Size = UDim2.fromScale(1/18, 1),
+			Position = UDim2.fromScale(17/18, 0)
 		}
 		local countdownTextChildren = {}
 		local countdownTextProps = {
@@ -112,7 +112,7 @@ function LikePrompt.render(self)
 		contentChildren.CountdownContainer = createElement("Frame", countdownFrameProps, countdownTextChildren)
 		innerContainerChildren.Inner = createElement(PaddedContainer, {
 			aspectRatio = 18,
-			verticalPaddingRatio = 7.111111111111111,
+			verticalPaddingRatio = 64/9,
 			backgroundTransparency = 1
 		}, contentChildren)
 		innerContainerChildren.Stroke = createElement("UIStroke", {

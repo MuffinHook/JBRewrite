@@ -8,16 +8,16 @@ return {
 			if part then
 				if part ~= lastPart then
 					local boundingMin, boundingMax = part:GetBoundingBox()
-					_ = boundingMin
+					local _ = boundingMin
 					lastSize = boundingMax
 					lastPart = part
 					local UpDot = part:FindFirstChild("UpDot")
 					if UpDot and UpDot.Value ~= 1 then
-						rotationCFrame = if UpDot.Value == 0 then CFrame.Angles(1.5707963267948966, 0, 1.5707963267948966) else CFrame.Angles(0, 0, math.pi)
+						rotationCFrame = if UpDot.Value == 0 then CFrame.Angles(math.pi / 2, 0, math.pi / 2) else CFrame.Angles(0, 0, math.pi)
 					end
 				end
 				local currentTime = os.clock()
-				camera.CFrame = CFrame.new(0, 0, 0) * rotationCFrame * CFrame.Angles(0, currentTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, lastSize.Magnitude * 0.8)
+				camera.CFrame = CFrame.new(0, 0, 0) * rotationCFrame * CFrame.Angles(0, currentTime % math.tau, 0) * CFrame.Angles(math.sin(currentTime * 0.5) * 0.3 - 0.4, 0, 0) * CFrame.new(0, 0, lastSize.Magnitude * 0.8)
 			end
 		end
 	end,

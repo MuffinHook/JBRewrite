@@ -13,7 +13,7 @@ local function GetInstance(colorItem)
 end
 local function Update(headlightPart, boundingBoxReference)
 	local normalizedTime = os.clock() / 2
-	headlightPart.CFrame = CFrame.Angles(0, math.pi + math.cos(normalizedTime % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(normalizedTime) * 0.1 - 0.05, 0, 0) * CFrame.new(0, 0, boundingBoxReference.BoundingBox.Size.Magnitude * 0.7)
+	headlightPart.CFrame = CFrame.Angles(0, math.pi + math.cos(normalizedTime % math.tau) * 0.1, 0) * CFrame.Angles(math.sin(normalizedTime) * 0.1 - 0.05, 0, 0) * CFrame.new(0, 0, boundingBoxReference.BoundingBox.Size.Magnitude * 0.7)
 end
 return {
 	Items = Color.Items,

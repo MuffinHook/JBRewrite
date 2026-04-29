@@ -281,7 +281,7 @@ function ReportCrewComponent.render(self)
 	mainFrameChildren.Container = createElement(PaddedContainer, {
 		backgroundTransparency = 1,
 		aspectRatio = 0.75,
-		verticalPaddingRatio = 85.33333333333333,
+		verticalPaddingRatio = 256/3,
 		paddingNone = true
 	}, containerChildren)
 	return createElement("Frame", mainFrameProps, mainFrameChildren)

@@ -18,7 +18,7 @@ return {
 					particleEffect.Parent = Attachment
 					particleEffect:Emit(3)
 					particleEffect.Enabled = true
-					delay(1.5, function()
+					task.delay(1.5, function()
 						particleEffect.Enabled = false
 					end)
 				end))

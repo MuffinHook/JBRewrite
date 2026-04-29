@@ -17,7 +17,7 @@ local function GetInstance(stickerConfig)
 end
 local function Update(tireInstance, updateDelta)
 	local elapsedTime = os.clock() / 2
-	tireInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
+	tireInstance.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, 3)
 end
 return {
 	Items = {

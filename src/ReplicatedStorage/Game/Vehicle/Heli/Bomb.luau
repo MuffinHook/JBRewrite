@@ -29,7 +29,7 @@ function t.Animate(bombInstance, startTime)
 		local frameDelta = currentTime - lastFrameTime
 		lastFrameTime = currentTime
 		local velocityVector = bombInstance.v0 * deltaTime + Vector3.new(0, -98.10000000000001 * deltaTime * deltaTime, 0)
-		bombInstance.Model.Rocket.CFrame = CFrame.new(gravityConstant, (bombInstance.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, deltaTime * 1.3333333333333333))))) * bombRotationOffset + bombInstance.p0.p + velocityVector
+		bombInstance.Model.Rocket.CFrame = CFrame.new(gravityConstant, (bombInstance.p0.LookVector:Lerp(Vector3.new(0, -1, 0), (math.min(1, deltaTime * 4/3))))) * bombRotationOffset + bombInstance.p0.p + velocityVector
 		if deltaTime - frameDelta < 0.3 and deltaTime > 0.3 then
 			bombInstance.Model.Fire.Particle.Enabled = true
 		end
@@ -48,7 +48,7 @@ end
 local eventRemote = nil
 function t.Explode(bombInstance, explosionPosition)
 	bombInstance.Exploded = true
-	delay(2, function()
+	task.delay(2, function()
 		bombInstance:Destroy()
 	end)
 	if bombInstance.Runtime then

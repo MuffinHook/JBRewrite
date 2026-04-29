@@ -32,14 +32,14 @@ return {
 				PowerPlantRobberyGui.Price.Value.Size = UDim2.new(progressFraction, 0, 1, 0)
 				local currencyPrefix, mainDigits, currencySuffix = string.match(math.floor(robberyData.BaseWorth * progressFraction / 50 + 0.5) * 50, "^([^%d]*%d)(%d*)(.-)$")
 				PowerPlantRobberyGui.Price.TextLabel.Text = ("Uranium Value: $%s"):format(currencyPrefix .. mainDigits:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. currencySuffix)
-				wait(0.1)
+				task.wait(0.1)
 			end
 		end
 		local function Show()
 			assert(isRunning == false)
 			isRunning = true
 			PowerPlantRobberyGui.Parent = LocalPlayer.PlayerGui
-			spawn(StartRuntime)
+			task.spawn(StartRuntime)
 		end
 		local function Hide()
 			assert(isRunning == true)
@@ -50,7 +50,7 @@ return {
 		local musicFadeConnection = nil
 		function eventManager.kvcs1mf0()
 			Audio.ObjectLocal(LocalPlayer, 1837831244)
-			delay(1, function()
+			task.delay(1, function()
 				Audio.ObjectLocal(LocalPlayer, 1843025542)
 			end)
 			ambientSound.Volume = 0
@@ -84,7 +84,7 @@ return {
 			assert(isRunning == false)
 			isRunning = true
 			PowerPlantRobberyGui.Parent = LocalPlayer.PlayerGui
-			spawn(StartRuntime)
+			task.spawn(StartRuntime)
 		end
 		function eventManager.q6l39vgi()
 			Audio.ObjectLocal(script, 1988476450)

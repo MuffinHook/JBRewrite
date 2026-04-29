@@ -43,7 +43,7 @@ function Missile.Animate(self, currentTime)
 	local launchPosition, ignitionTime, explosionDelay, _ = CalculateConstants(self.Origin.p, OriginVelocity, self.Target, self.DropPeriod, self.IgnoreList)
 	local Unit = (self.Target - launchPosition).Unit
 	local velocityAlignment = OriginVelocity:Dot(Unit)
-	local lastHeartbeatTime = currentTime - 0.03333333333333333
+	local lastHeartbeatTime = currentTime - 1/30
 	local function Ignite()
 		self.Part.Fire.Enabled = true
 		audioModule.ObjectLocal(self.Part, 1386598740, {
@@ -77,7 +77,7 @@ function Missile.Animate(self, currentTime)
 	self.Runtime = RunService.Heartbeat:Connect(Heartbeat)
 end
 function Missile.Explode(self)
-	delay(2, function()
+	task.delay(2, function()
 		self:Destroy()
 	end)
 	self.Part.Transparency = 1

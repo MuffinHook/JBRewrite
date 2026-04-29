@@ -57,7 +57,7 @@ function ForcefieldInstance.AttemptLaunch(forcefield, targetPosition, projectile
 	local projectile = SimulatedPhysicsProjectile.new(targetPosition)
 	projectile:HitTargetWithSpeed(projectileSpeed, 75, false)
 	forcefield.PartShell.Parent = workspace
-	local collisionPosition, collisionTime = projectile:CalculateNextInstantCollision(0.03333333333333333)
+	local collisionPosition, collisionTime = projectile:CalculateNextInstantCollision(1/30)
 	if ForcefieldService.getIsPositionAllowed(collisionPosition) then
 		local startTime = os.clock()
 		local heartbeatConnection = nil

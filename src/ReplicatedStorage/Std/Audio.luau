@@ -10,7 +10,7 @@ local function Preload(audioIds)
 		Sound.SoundId = "rbxassetid://" .. soundId
 		table.insert(soundsToPreload, Sound)
 	end
-	spawn(function()
+	task.spawn(function()
 		ContentProvider:PreloadAsync(soundsToPreload)
 		for _, sound in next, soundsToPreload do
 			sound:Destroy()
@@ -122,11 +122,11 @@ local function WorldPositionLocal(position, soundId, options)
 	return ObjectLocal(SoundPart, soundId, options)
 end
 local function FadeOut(sound, fadeDuration)
-	spawn(function()
+	task.spawn(function()
 		local Volume = sound.Volume
 		for i = 1, 0, -0.03 / fadeDuration do
 			sound.Volume = Volume * i
-			wait()
+			task.wait()
 		end
 		sound.Volume = 0
 	end)

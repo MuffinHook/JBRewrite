@@ -89,7 +89,7 @@ CharacterUtils.observeCharacterAdded(function(character, maid)
 		maid:GiveTask(Interval.every(0.1):Connect(function()
 			local serverPosition = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
 			if configTable._position and (not configTable.part and serverPosition) then
-				configTable._updatePosition((configTable._position:getValue():Lerp(serverPosition.Value, 0.3333333333333333)))
+				configTable._updatePosition((configTable._position:getValue():Lerp(serverPosition.Value, 1/3)))
 			end
 		end))
 	end
@@ -151,7 +151,7 @@ local function setWaypoint(waypointConfig)
 		end
 		waypointMarker.Parent = workspace
 		waypointMaid:GiveTask(RunService.Heartbeat:Connect(function()
-			waypointMarker.Arrow.CFrame = waypointMarker.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % 6.283185307179586, 0)
+			waypointMarker.Arrow.CFrame = waypointMarker.ArrowRoot.CFrame * CFrame.Angles(0, os.clock() % math.tau, 0)
 		end))
 		waypointMaid:GiveTask(waypointMarker)
 		local Attachment = Instance.new("Attachment")

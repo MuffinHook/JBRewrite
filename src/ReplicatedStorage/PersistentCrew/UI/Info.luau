@@ -157,7 +157,7 @@ function InfoComponent.render(self)
 			})
 		})
 	end
-	local flagHeightScale = 0.3055555555555556 * self.props.aspectRatio / 1.5
+	local flagHeightScale = 11/36 * self.props.aspectRatio / 1.5
 	local isOwnerNotEditing = Players.LocalPlayer
 	if isOwnerNotEditing then
 		isOwnerNotEditing = if Players.LocalPlayer.UserId == self.props.clanOwnerUserId then not self.state.isEditingClanName else false
@@ -170,7 +170,7 @@ function InfoComponent.render(self)
 	local headerBarProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		size = UDim2.new(1, 0, 0.09090909090909091, 0),
+		size = UDim2.new(1, 0, 1/11, 0),
 		paddingLeft = 0,
 		paddingRight = 0,
 		paddingTop = 0,
@@ -308,8 +308,8 @@ function InfoComponent.render(self)
 	rootChildren.Flag = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0, 0, 0.09090909090909091, 0),
-		size = UDim2.new(0.25, 0, 0.8181818181818181 * flagHeightScale, 0),
+		position = UDim2.new(0, 0, 1/11, 0),
+		size = UDim2.new(0.25, 0, 9/11 * flagHeightScale, 0),
 		paddingLeft = 0,
 		paddingRight = 0.5,
 		paddingTop = 0.5,
@@ -337,8 +337,8 @@ function InfoComponent.render(self)
 	local statsContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0, 0, 0.8181818181818181 * flagHeightScale + 0.09090909090909091, 0),
-		size = UDim2.new(0.25, 0, 0.8181818181818181 * (1 - flagHeightScale), 0),
+		position = UDim2.new(0, 0, 9/11 * flagHeightScale + 1/11, 0),
+		size = UDim2.new(0.25, 0, 9/11 * (1 - flagHeightScale), 0),
 		paddingLeft = 0,
 		paddingRight = 0.5,
 		paddingTop = 0.5,
@@ -491,7 +491,7 @@ function InfoComponent.render(self)
 		readyUpContainerChildren.Button = createElement(TextButton, readyUpButtonProps)
 		readyUpContainer = createElement(PaddedContainer, readyUpContainerProps, readyUpContainerChildren)
 	else
-		readyUpContainer = isAdminOfCurrentClan
+		readyUpContainer = self.props.isAdminOfCurrentClan
 	end
 	statsChildren.ReadyUpContainer = readyUpContainer
 	statsChildren.Leave = self.props.isPlayersClan and createElement(PaddedContainer, {
@@ -555,7 +555,7 @@ function InfoComponent.render(self)
 	local tabBarContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0.25, 0, 0.09090909090909091, 0),
+		position = UDim2.new(0.25, 0, 1/11, 0),
 		size = UDim2.new(0.375, 0, 0.1, 0),
 		paddingLeft = 0.5,
 		paddingRight = 0.5,
@@ -603,7 +603,7 @@ function InfoComponent.render(self)
 	rootChildren.Search = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0.625, 0, 0.09090909090909091, 0),
+		position = UDim2.new(0.625, 0, 1/11, 0),
 		size = UDim2.new(0.375, 0, 0.1, 0),
 		paddingLeft = 0.5,
 		paddingRight = 0,
@@ -646,8 +646,8 @@ function InfoComponent.render(self)
 	rootChildren.Body2Bottom = createElement(PaddedContainer, {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0.25, 0, 0.19090909090909092, 0),
-		size = UDim2.new(0.75, 0, 0.7181818181818181, 0),
+		position = UDim2.new(0.25, 0, 0.190909, 0),
+		size = UDim2.new(0.75, 0, 0.718182, 0),
 		paddingLeft = 0.5,
 		paddingRight = 0,
 		paddingTop = 0.5,
@@ -677,8 +677,8 @@ function InfoComponent.render(self)
 	local footerContainerProps = {
 		backgroundColor = Color3.new(51/255, 51/255, 51/255),
 		backgroundTransparency = 0,
-		position = UDim2.new(0, 0, 0.9090909090909091, 0),
-		size = UDim2.new(1, 0, 0.09090909090909091, 0),
+		position = UDim2.new(0, 0, 10/11, 0),
+		size = UDim2.new(1, 0, 1/11, 0),
 		paddingLeft = 0,
 		paddingRight = 0,
 		paddingTop = 0.5,
@@ -699,7 +699,7 @@ function InfoComponent.render(self)
 			}),
 			SearchContainer = createElement("Frame", {
 				BackgroundTransparency = 1,
-				Size = UDim2.new(0.3333333333333333, 0, 1, 0),
+				Size = UDim2.new(1/3, 0, 1, 0),
 				LayoutOrder = 10
 			}, {
 				Search = createElement(PaddedContainer, {}, {

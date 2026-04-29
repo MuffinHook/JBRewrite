@@ -135,7 +135,7 @@ function interface.LoseFocus(cmdrInterface, focusState)
 		cmdrInterface:Hide()
 	end
 	if focusState and cmdrInterface.Valid then
-		wait()
+		task.wait()
 		cmdrInterface:SetEntryText("")
 		cmdrInterface.ProcessEntry(Text)
 	elseif focusState then
@@ -183,7 +183,7 @@ function interface.BeginInput(cmdrInterface, input, isGameProcessed)
 				lastActivationTick = tick()
 			elseif cmdrInterface.Cmdr.Enabled then
 				cmdrInterface:SetVisible(not cmdrInterface:IsVisible())
-				wait()
+				task.wait()
 				cmdrInterface:SetEntryText("")
 				if GuiService.MenuIsOpen then
 					cmdrInterface:Hide()
@@ -205,7 +205,7 @@ function interface.BeginInput(cmdrInterface, input, isGameProcessed)
 		elseif input.KeyCode == Enum.KeyCode.Up then
 			cmdrInterface:SelectVertical(-1)
 		elseif input.KeyCode == Enum.KeyCode.Return then
-			wait()
+			task.wait()
 			cmdrInterface:SetEntryText(cmdrInterface:GetEntryText():gsub("\n", ""):gsub("\r", ""))
 		elseif input.KeyCode == Enum.KeyCode.Tab then
 			local selectedItem = cmdrInterface.AutoComplete:GetSelectedItem()
@@ -241,10 +241,10 @@ function interface.BeginInput(cmdrInterface, input, isGameProcessed)
 					commandText = itemName
 					needsSpace = true
 				end
-				wait()
+				task.wait()
 				cmdrInterface:SetEntryText(commandText .. if needsSpace then " " else "")
 			else
-				wait()
+				task.wait()
 				cmdrInterface:SetEntryText(cmdrInterface:GetEntryText())
 			end
 		else

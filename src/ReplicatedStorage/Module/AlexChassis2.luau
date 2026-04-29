@@ -542,7 +542,7 @@ local function UpdateHQ_3(p1, p2) --[[ UpdateHQ | Line: 495 | Upvalues: t3 (copy
 			local _ = math.abs(v9.Z) < 1
 		end
 		_cachedEngine.NoGravForce.Force = Vector3.new(0, 1, 0) * _cachedEngine.AssemblyMass * workspace.Gravity * (1 - if Nitro then 30 else 100 / 196.20000000000002)
-		p1.WheelRotation = (p1.WheelRotation + v9.Z * p2 / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		p1.WheelRotation = (p1.WheelRotation + v9.Z * p2 / Wheels[1].VisualHalfHeight) % math.tau
 		UpdateWheels(p1, p2, true)
 		t2[p1.Make].UpdateHQ(p1, p2)
 		local v48 = math.clamp(v22 * Gears[1] * v13 * 30 / math.pi / p1.Config.RPMTopLine, 0, 1)
@@ -579,9 +579,9 @@ local function UpdateLQ_3(p1, p2) --[[ UpdateLQ | Line: 810 | Upvalues: vectorTo
 		local v1 = vectorToObjectSpace(_cachedEngine.CFrame, _cachedEngine.Velocity)
 		p1.VisualTurnAngle = -_cachedEngine.RotVelocity.Y * 0.3
 		local Wheels = p1.Wheels
-		p1.WheelRotation = (p1.WheelRotation + v1.Z * p2 / Wheels[1].VisualHalfHeight) % 6.283185307179586
+		p1.WheelRotation = (p1.WheelRotation + v1.Z * p2 / Wheels[1].VisualHalfHeight) % math.tau
 		UpdateWheels(p1, p2, false)
-		local v4 = math.clamp(math.abs(v1.Z) * 60 * p2 / Wheels[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / 6.283185307179586 / p1.Config.RPMTopLine, 0, 1)
+		local v4 = math.clamp(math.abs(v1.Z) * 60 * p2 / Wheels[1].VisualHalfHeight * Gears[1] * Gears[3] * 60 / math.tau / p1.Config.RPMTopLine, 0, 1)
 		local v5 = p1.RPMSlow or 0
 		local v6 = v5 + (v4 - v5) * 0.1
 		p1.RPMSlow = v6

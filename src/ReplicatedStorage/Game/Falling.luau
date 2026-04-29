@@ -169,7 +169,7 @@ local function StopSkydiving()
 			windFadeConnection = nil
 		end
 		windFadeConnection = Audio.FadeTo(fadingSound, 0, 0.1)
-		delay(1, function()
+		task.delay(1, function()
 			fadingSound:Destroy()
 			fadingSound = nil
 		end)
@@ -310,7 +310,7 @@ local function Heartbeat()
 			end
 			if isSkydiving == true and skydiveForce then
 				local dragForce = absVerticalSpeed * 0.6 * math.abs(absVerticalSpeed)
-				local maxDragForce = 196.20000000000002 * characterMass * 10
+				local maxDragForce = 196.2 * characterMass * 10
 				if dragForce < 0 then
 					dragForce = 0
 				elseif maxDragForce < dragForce then

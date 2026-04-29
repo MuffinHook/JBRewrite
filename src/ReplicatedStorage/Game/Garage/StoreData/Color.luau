@@ -250,7 +250,7 @@ table.insert(colorsList, 1, {
 })
 local function Update(colorPart, p2)
 	local timeAngle = os.clock() / 2
-	colorPart.CFrame = CFrame.Angles(0, timeAngle % 6.283185307179586, 0) * CFrame.Angles(math.sin(timeAngle) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+	colorPart.CFrame = CFrame.Angles(0, timeAngle % math.tau, 0) * CFrame.Angles(math.sin(timeAngle) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 return {
 	Items = colorsList,

@@ -3,7 +3,7 @@ local SolveIK = require(ReplicatedStorage.Module.Logic).SolveIK
 CFrame.new()
 local cframe = CFrame.new(-0.1, -0.2, -0.05)
 local cframe2 = CFrame.new(0.1, -0.2, -0.05)
-local cframe3 = CFrame.Angles(1.5707963267948966, 0, 0)
+local cframe3 = CFrame.Angles(math.pi / 2, 0, 0)
 local function isNanV3(vector)
 	return if vector.x == vector.x and vector.y == vector.y then vector.z ~= vector.z else true
 end

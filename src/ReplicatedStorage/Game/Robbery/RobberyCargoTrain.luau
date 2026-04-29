@@ -85,7 +85,7 @@ local function OpenVaultDoorRaw(trainCar)
 			Explosion.BlastPressure = 5000
 			Explosion.Parent = Root
 			game.Debris:AddItem(Explosion, 5)
-			wait(0.1)
+			task.wait(0.1)
 			local startTime = tick()
 			local heartbeatConnection = nil
 			local function Heartbeat()

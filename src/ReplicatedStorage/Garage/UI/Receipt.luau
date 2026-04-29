@@ -15,7 +15,7 @@ function Receipt.render(self)
 	local cornerPixel = self.props.cornerPixel
 	local paddingRatio = self.props.paddingRatio
 	local doublePaddingRatio = self.props.paddingRatio * 2
-	local adjustedRatio = self.props.showTotal and 1 / (1 / mainRatio - 0.2222222222222222) or mainRatio
+	local adjustedRatio = self.props.showTotal and 1 / (1 / mainRatio - 2/9) or mainRatio
 	local sum = 0
 	local receiptElements = {}
 	local count = 0

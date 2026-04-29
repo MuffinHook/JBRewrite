@@ -751,7 +751,7 @@ function AppComponent.render(self)
 			size = UDim2.new(0.5, 0, 0.5, 0),
 			position = UDim2.new(0.5, 0, 0.5, 0),
 			distance = 96,
-			aspectRatio = 1.7777777777777777,
+			aspectRatio = 16/9,
 			expireDistance = self.state.cctvViewerExpireDistance,
 			cameraTag = "CCTVCamera",
 			fieldOfView = 70,
@@ -827,18 +827,18 @@ function AppComponent.render(self)
 	tradeProps.position = self.state.isSmallScreen and UDim2.new(0.5, 0, 0.5, 0) or UDim2.new(0.5, 0, 0.55, 0)
 	children.Trade = createElement(Trade, tradeProps)
 	local tradeInitiationsProps = {
-		size = UDim2.new(0.3333333333333333, 0, 0.3333333333333333, 0)
+		size = UDim2.new(1/3, 0, 1/3, 0)
 	}
-	tradeInitiationsProps.position = if self.state.isSmallScreen then UDim2.new(0.5, 0, 0.6666666666666666, 0) else UDim2.new(1, 0, 0.7, 0)
+	tradeInitiationsProps.position = if self.state.isSmallScreen then UDim2.new(0.5, 0, 2/3, 0) else UDim2.new(1, 0, 0.7, 0)
 	tradeInitiationsProps.anchorPoint = if self.state.isSmallScreen then Vector2.new(0.5, 0.5) else Vector2.new(1, 0.5)
 	children.TradeInitiations = createElement(TradeInitiations, tradeInitiationsProps)
 	children.TradeResult = createElement(TradeResult, {
 		size = UDim2.new(0.25, 0, 0.25, 0),
-		position = UDim2.new(0.5, 0, 0.3333333333333333, 0),
+		position = UDim2.new(0.5, 0, 1/3, 0),
 		anchorPoint = Vector2.new(0.5, 0.5)
 	})
 	children.RewardSpinner = createElement(RewardSpinner, {
-		size = UDim2.new(0.3333333333333333, 0, 0.25, 0),
+		size = UDim2.new(1/3, 0, 0.25, 0),
 		position = UDim2.new(0.5, 0, 0.03125, 0),
 		anchorPoint = Vector2.new(0.5, 0)
 	})

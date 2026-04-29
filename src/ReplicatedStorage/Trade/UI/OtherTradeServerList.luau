@@ -9,7 +9,7 @@ local paddedScrollingGrid = require(ReplicatedStorage.EzUi.paddedScrollingGrid)
 local OtherTradeServerListComponent = Roact.PureComponent:extend("OtherTradeServerList")
 OtherTradeServerListComponent.defaultProps = {
 	verticalPaddingRatio = 96,
-	aspectRatio = 1.7777777777777777
+	aspectRatio = 16/9
 }
 function OtherTradeServerListComponent.render(selfComponent)
 	if selfComponent.props.visible then

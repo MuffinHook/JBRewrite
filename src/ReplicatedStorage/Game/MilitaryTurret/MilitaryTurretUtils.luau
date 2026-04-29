@@ -4,8 +4,8 @@ local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
 local Settings = require(ReplicatedStorage.Resource.Settings)
 return {
 	shortAngleDist = function(angle1, angle2)
-		local angleDifference = (angle2 - angle1) % 6.283185307179586
-		return 2 * angleDifference % 6.283185307179586 - angleDifference
+		local angleDifference = (angle2 - angle1) % math.tau
+		return 2 * angleDifference % math.tau - angleDifference
 	end,
 	getNearestNonPolice = function(searchPosition, maxDistance)
 		local minDistance = maxDistance or (1 / 0)

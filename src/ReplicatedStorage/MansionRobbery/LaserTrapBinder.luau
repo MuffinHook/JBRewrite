@@ -87,7 +87,7 @@ function LaserTrapClass._flicker(self)
 			local flickerStartTime = os.clock()
 			repeat
 				RunService.Heartbeat:Wait()
-			until 0.7777777777777778 ^ (6 - i) * 0.06666666666666667 <= os.clock() - flickerStartTime
+			until 7/9 ^ (6 - i) * 1/15 <= os.clock() - flickerStartTime
 		end
 		self:_setPartsVisible(true)
 		task.wait(2)

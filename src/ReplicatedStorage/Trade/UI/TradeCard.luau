@@ -105,7 +105,7 @@ function TradeCard.render(props)
 			BackgroundColor3 = finalItemColor,
 			BackgroundTransparency = 0,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
+			Position = UDim2.new(1/10, 0, 1 - scaledItemHeight - 1/10, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -128,7 +128,7 @@ function TradeCard.render(props)
 			BackgroundColor3 = finalItemColor,
 			BackgroundTransparency = 0,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
+			Position = UDim2.new(1/10, 0, 1 - scaledItemHeight - 1/10, 0)
 		}, {
 			UICorner = createElement("UICorner", {
 				CornerRadius = UDim.new(1, 0)
@@ -209,7 +209,7 @@ function TradeCard.render(props)
 				getInstCompare = props.props.getInstCompare,
 				updateCamera = props.props.updateCamera,
 				size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-				position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
+				position = UDim2.new(1/10, 0, 1 - scaledItemHeight - 1/10, 0)
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
@@ -220,7 +220,7 @@ function TradeCard.render(props)
 				BorderSizePixel = 0,
 				BackgroundColor3 = finalItemColor,
 				Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-				Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0)
+				Position = UDim2.new(1/10, 0, 1 - scaledItemHeight - 1/10, 0)
 			}, {
 				UICorner = createElement("UICorner", {
 					CornerRadius = UDim.new(1, 0)
@@ -419,7 +419,7 @@ function TradeCard.render(props)
 		children.Selected = createElement("ImageLabel", {
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0.8, 0, 0.8 * aspectRatio, 0),
-			Position = UDim2.new(0.09999999999999998, 0, 1 - scaledItemHeight - 0.09999999999999998, 0),
+			Position = UDim2.new(1/10, 0, 1 - scaledItemHeight - 1/10, 0),
 			Image = "rbxassetid://9839329507",
 			ZIndex = 6
 		})

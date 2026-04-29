@@ -75,6 +75,7 @@ local function Action(drawerRoot, isPressed)
 		end
 		return true
 	end
+	return nil
 end
 local function AddedFun(drawerInstance)
 	CircleAction.Add({
@@ -120,7 +121,7 @@ return {
 			CellTime.Visible = true
 			local startTick = tick()
 			while true do
-				wait(1)
+				task.wait(1)
 				if timerId ~= timerId then
 					break
 				end

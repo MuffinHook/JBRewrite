@@ -138,7 +138,7 @@ function BriefcaseUtilsModule.getCFrameAt(elapsedTime, origin, target, targetNor
 	if totalDuration < elapsedTime then
 		elapsedTime = totalDuration
 	end
-	local rotationPhase = elapsedTime % 6.283185307179586
+	local rotationPhase = elapsedTime % math.tau
 	local landingProgress = if totalDuration - 1 < elapsedTime then (elapsedTime - totalDuration) / 1 + 1 else 0
 	local landingProgressSquared = landingProgress * landingProgress
 	return getQuaternionBetween(Vector3.new(0, 1, 0), (Vector3.new(0, 1, 0)):lerp(targetNormal, landingProgressSquared), Vector3.new(0, 0, 1)) * CFrame.Angles(math.cos(rotationPhase) * 0.2 * (1 - landingProgressSquared), rotationPhase, math.sin(rotationPhase) * 0.2 * (1 - landingProgressSquared)) + origin + (target - origin) * (elapsedTime / totalDuration)

@@ -12,8 +12,8 @@ local GeomUtils = require(ReplicatedStorage.Std.GeomUtils)
 local Raycast = require(ReplicatedStorage.Std.Raycast)
 local Signal = require(ReplicatedStorage.Std.Signal)
 local function ShortAngleDist(angle1, angle2)
-	local normalizedAngleDelta = (angle2 - angle1) % 6.283185307179586
-	return 2 * normalizedAngleDelta % 6.283185307179586 - normalizedAngleDelta
+	local normalizedAngleDelta = (angle2 - angle1) % math.tau
+	return 2 * normalizedAngleDelta % math.tau - normalizedAngleDelta
 end
 local soundAssets = {
 	weapon_cannon_shot_04 = 2205008075
@@ -39,7 +39,7 @@ function TurretClass.new(turretModel)
 	turret.onLocalPlayerHit = Signal.new()
 	turret.Target = Vector3.new()
 	turret.MaxDHorizontalAngle = 1.2566370614359172
-	turret.HorizontalAngle = 1.5707963267948966
+	turret.HorizontalAngle = math.pi / 2
 	turret.TargetHorizontalAngle = 0
 	turret.SpringHorizontalAngle = Spring.new(turret.HorizontalAngle, 0, 0.7, 15)
 	turret.MaxDVerticalAngle = 1.2566370614359172
@@ -64,7 +64,7 @@ function TurretClass.PointAt(self, targetPosition)
 		self.TargetHorizontalAngle = TurretUtils.computeHorizontalAngle(self.Model, self.MotorBase, targetPosition)
 		self.TargetVerticalAngle = TurretUtils.computeVerticalAngle(self.Model, self.MotorArm, targetPosition)
 	else
-		self.TargetHorizontalAngle = 1.5707963267948966
+		self.TargetHorizontalAngle = math.pi / 2
 		self.TargetVerticalAngle = 0
 	end
 end
@@ -72,10 +72,10 @@ function TurretClass.Update(self)
 	local currentTime = os.clock()
 	local deltaTime = currentTime - self.LastUpdate
 	self.LastUpdate = currentTime
-	local horizontalAngleDelta = (self.TargetHorizontalAngle - self.HorizontalAngle) % 6.283185307179586
-	self.HorizontalAngle = self.HorizontalAngle + math.clamp(2 * horizontalAngleDelta % 6.283185307179586 - horizontalAngleDelta, -self.MaxDHorizontalAngle * deltaTime, self.MaxDHorizontalAngle * deltaTime)
+	local horizontalAngleDelta = (self.TargetHorizontalAngle - self.HorizontalAngle) % math.tau
+	self.HorizontalAngle = self.HorizontalAngle + math.clamp(2 * horizontalAngleDelta % math.tau - horizontalAngleDelta, -self.MaxDHorizontalAngle * deltaTime, self.MaxDHorizontalAngle * deltaTime)
 	local springHorizontalAngle = self.SpringHorizontalAngle:SetTarget(self.HorizontalAngle)
-	self.VerticalAngle = math.clamp(self.VerticalAngle + math.clamp(self.TargetVerticalAngle - self.VerticalAngle, -self.MaxDVerticalAngle * deltaTime, self.MaxDVerticalAngle * deltaTime), -0.9424777960769379, 1.5707963267948966)
+	self.VerticalAngle = math.clamp(self.VerticalAngle + math.clamp(self.TargetVerticalAngle - self.VerticalAngle, -self.MaxDVerticalAngle * deltaTime, self.MaxDVerticalAngle * deltaTime), -0.9424777960769379, math.pi / 2)
 	TurretUtils.updateModel(self.MotorBase, self.MotorArm, springHorizontalAngle, (self.SpringVerticalAngle:SetTarget(self.VerticalAngle)))
 	local barrelRecoilOffset = self.SpringShoot:Update()
 	self.MotorBarrel.C1 = self.MotorBarrel.C0:Inverse() * CFrame.new(0, 0, barrelRecoilOffset) * self.MotorBarrel.C0
@@ -89,7 +89,7 @@ function TurretClass.Update(self)
 	end
 end
 function TurretClass.GetShootHz(self)
-	return self.Model:GetAttribute(TurretConsts.SHOOT_HZ_ATTR_NAME) or 0.6666666666666666
+	return self.Model:GetAttribute(TurretConsts.SHOOT_HZ_ATTR_NAME) or 2/3
 end
 function TurretClass.ShootRocket(self)
 	self.SpringShoot:Accelerate(100)
@@ -143,7 +143,7 @@ function TurretClass.ShootLaser(self)
 		local laserLength = direction.Magnitude
 		Part.Size = Vector3.new(0.5, 0.5, laserLength)
 		local rotationTime = os.clock()
-		Part.CFrame = CFrame.new(Vector3.new(0, 0, 0), direction.Unit) * CFrame.new(0, 0, -laserLength / 2) * CFrame.Angles(0, 0, rotationTime * 20 % 6.283185307179586) + Tip.Position
+		Part.CFrame = CFrame.new(Vector3.new(0, 0, 0), direction.Unit) * CFrame.new(0, 0, -laserLength / 2) * CFrame.Angles(0, 0, rotationTime * 20 % math.tau) + Tip.Position
 		if self.shoot1Sound then
 			self.shoot1Sound:Play()
 		else

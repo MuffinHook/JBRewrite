@@ -10,11 +10,11 @@ return function(targetContainer)
 		return Roact.createElement(RoactRodux.StoreProvider, {
 			store = persistentCrewStore
 		}, { Roact.createElement(JoinOrCreate, {
-				aspectRatio = 1.7777777777777777,
+				aspectRatio = 16/9,
 				verticalPaddingRatio = 128
 			}, {
 				AspectRatioConstraint = Roact.createElement("UIAspectRatioConstraint", {
-					AspectRatio = 1.7777777777777777
+					AspectRatio = 16/9
 				})
 			}) })
 	end

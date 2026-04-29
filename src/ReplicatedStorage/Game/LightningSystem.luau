@@ -28,7 +28,7 @@ local LightningModule = {
 			TimePosition = 1,
 			MaxPlaybackTime = 8
 		})
-		delay(8, function()
+		task.delay(8, function()
 			Part:Destroy()
 		end)
 		local currentTime = tick()

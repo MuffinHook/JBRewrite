@@ -11,7 +11,7 @@ local function PlaySound(soundParent, soundId)
 	Sound.Volume = 0.75
 	Sound.Parent = soundParent
 	Sound:Play()
-	delay(1, function()
+	task.delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
@@ -34,7 +34,7 @@ return function(museumEventConfig)
 				break
 			end
 			Sound.Volume = i
-			wait()
+			task.wait()
 		end
 	end
 	local function FadeOutSound()
@@ -45,7 +45,7 @@ return function(museumEventConfig)
 				return
 			end
 			Sound.Volume = i
-			wait()
+			task.wait()
 		end
 		Sound:Stop()
 	end
@@ -56,17 +56,17 @@ return function(museumEventConfig)
 		end
 		isPlayerInRobbery = true
 		PlaySound(LocalPlayer, 1837831244)
-		delay(1, function()
+		task.delay(1, function()
 			PlaySound(LocalPlayer, 1843025542)
 		end)
-		spawn(FadeInSound)
+		task.spawn(FadeInSound)
 	end
 	local function ExitRobbery()
 		if not isPlayerInRobbery then
 			return error("Player not in robbery")
 		end
 		isPlayerInRobbery = false
-		spawn(FadeOutSound)
+		task.spawn(FadeOutSound)
 	end
 	function em.dhqg05sg()
 		EnterRobbery()
@@ -74,7 +74,7 @@ return function(museumEventConfig)
 	function em.exsgze3l()
 		if isPlayerInRobbery then
 			isPlayerInRobbery = false
-			spawn(FadeOutSound)
+			task.spawn(FadeOutSound)
 		else
 			error("Player not in robbery")
 		end
@@ -132,10 +132,10 @@ return function(museumEventConfig)
 				Part.Color = colorValue
 				speedMultiplier = if securityState.SecurityTripped then 2 else 1
 				local serverTime = workspace:GetServerTimeNow()
-				local period = 0.5 * node.Duration * node._speed
+				local period = getPeriod
 				if speedMultiplier ~= node._speed then
 					node._speed = speedMultiplier
-					local newPeriod = 0.5 * node.Duration * node._speed
+					local newPeriod = getPeriod()
 					node._offset = node._offset + (newPeriod - period) * serverTime
 					period = newPeriod
 				end
@@ -174,9 +174,8 @@ return function(museumEventConfig)
 	local function RemovedFun(instance)
 		CircleAction.Remove(instance)
 	end
-	local nextFunc = next
 	local initialDynamiteNodes, nodeIndex = CollectionService:GetTagged("Museum_DynamiteNode")
-	for dynamiteNodeKey, dynamiteNode in nextFunc, initialDynamiteNodes, nodeIndex do
+	for dynamiteNodeKey, dynamiteNode in next, initialDynamiteNodes, nodeIndex do
 		CircleAction.Add({
 			Part = dynamiteNode,
 			ValidRoot = dynamiteNode.Parent,
@@ -240,9 +239,8 @@ return function(museumEventConfig)
 		local _ = instance.Name
 		CircleAction.Remove(instance)
 	end
-	local nextFunc = next
 	local initialMuseumItems, itemIndex = CollectionService:GetTagged("Museum_Item")
-	for museumItemKey, museumItem in nextFunc, initialMuseumItems, itemIndex do
+	for museumItemKey, museumItem in next, initialMuseumItems, itemIndex do
 		AddedFun_2(museumItem)
 	end
 	CollectionService:GetInstanceAddedSignal("Museum_Item"):Connect(AddedFun_2)
@@ -272,9 +270,8 @@ return function(museumEventConfig)
 	local function RemovedFun_3(instance)
 		CircleAction.Remove(instance)
 	end
-	local nextFunc = next
 	local initialLeverNodes, leverIndex = CollectionService:GetTagged("Museum_Lever")
-	for leverNodeKey, leverNode in nextFunc, initialLeverNodes, leverIndex do
+	for leverNodeKey, leverNode in next, initialLeverNodes, leverIndex do
 		CircleAction.Add({
 			Part = leverNode,
 			Name = "Pull Lever",

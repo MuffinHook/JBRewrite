@@ -38,7 +38,7 @@ function StreetlightsModule.SetEnabled(enabled)
 		if streetlight.SetValue then
 			streetlight:SetValue(enabled)
 		end
-		wait(math.random() * 0.1)
+		task.wait(math.random() * 0.1)
 	end
 end
 function StreetlightsModule.Flicker()
@@ -48,7 +48,7 @@ function StreetlightsModule.Flicker()
 		for i2, streetlight in ipairs(StreetlightsModule._binder:GetAll()) do
 			streetlight:SetValue(isLit)
 		end
-		wait(0.2)
+		task.wait(0.2)
 	end
 	for i, streetlight in ipairs(StreetlightsModule._binder:GetAll()) do
 		streetlight:SetValue(StreetlightsModule._enabled)

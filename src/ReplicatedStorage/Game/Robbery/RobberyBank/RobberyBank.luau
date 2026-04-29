@@ -19,7 +19,7 @@ local function PlaySound(parent, soundId)
 	Sound.Volume = 0.75
 	Sound.Parent = parent
 	Sound:Play()
-	delay(1, function()
+	task.delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
@@ -64,7 +64,7 @@ function RobberyBankClass.SetupLasers(instance, layout)
 	instance.Maid:GiveTask(RunService.Heartbeat:Connect(function()
 		local elapsedTime = Time.GetNowSync() - instance.BornAtSync
 		for i, laser in ipairs(laserTable) do
-			laser.Part.CFrame = laser.Origin:lerp(laser.Target, math.cos(elapsedTime * (6.283185307179586 / laser.Period)) * -0.5 + 0.5)
+			laser.Part.CFrame = laser.Origin:lerp(laser.Target, math.cos(elapsedTime * (math.tau / laser.Period)) * -0.5 + 0.5)
 		end
 	end))
 	instance.Maid:GiveTask(function()
@@ -125,7 +125,7 @@ return {
 			assert(bankModel ~= nil)
 			bankInstance = RobberyBankClass.new(birthSync, bankModel)
 			Audio.ObjectLocal(LocalPlayer, 1837831244)
-			delay(1, function()
+			task.delay(1, function()
 				Audio.ObjectLocal(LocalPlayer, 1843025542)
 			end)
 			if soundFadeConnection ~= nil then

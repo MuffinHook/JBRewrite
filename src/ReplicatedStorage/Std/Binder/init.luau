@@ -16,7 +16,7 @@ function Binder.new(tagName, constructor, ...)
 	boundInstance._pendingInstSet = {}
 	boundInstance._listeners = {}
 	boundInstance._args = { ... }
-	delay(5, function()
+	task.delay(5, function()
 		if not boundInstance._loaded then
 			warn(("Binder %q is not loaded. Call :Start() on it!"):format(boundInstance._tagName))
 		end

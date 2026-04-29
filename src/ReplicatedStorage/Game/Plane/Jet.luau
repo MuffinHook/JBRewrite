@@ -341,7 +341,7 @@ local function MountLocalPlayer(jet, player, seat)
 	local PlaneGui = jet.Plane.PlaneGui
 	PlaneGui.Sights.Size = UDim2.new(0.08, 0, 0.08, 0)
 
-	seat.Maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+	seat.Maid:GiveTask(Interval.every(1/3):Connect(function()
 		UpdateTargetPart(jet)
 	end))
 

@@ -168,7 +168,7 @@ function TankBinder._handleSeatedGunner(self, gunner, seatMaid)
 				self._lastPitch = math.clamp(pitchAngle, -0.2617993877991494, 0.5235987755982988)
 			end
 			local now = os.clock()
-			if now - lastReplicateTime > 0.06666666666666667 then
+			if now - lastReplicateTime > 1/15 then
 				lastReplicateTime = now
 				self.manifest.replicateRingRemote:FireServer(self._lastYaw, self._lastPitch)
 			end

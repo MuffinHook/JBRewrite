@@ -9,6 +9,7 @@ local lrotate = bit32.lrotate
 local rrotate = bit32.rrotate
 local sha512Constants = {}
 local sha256Constants = {}
+local md5Constants = {}
 local sha512StateInitial = {}
 local sha256StateInitial = {}
 local sha224StateInitial = {}
@@ -128,17 +129,17 @@ local function sha512_feed_128(stateLo, stateHi, dataBuffer, dataOffset, dataLen
 			messageSchedule[k - 1] = bxor(rshift(messagePrev31, 1) + lshift(messagePrev30, 31), rshift(messagePrev31, 8) + lshift(messagePrev30, 24), (rshift(messagePrev31, 7))) + bxor(rshift(messagePrev5, 19) + lshift(messagePrev4, 13), lshift(messagePrev5, 3) + rshift(messagePrev4, 29), (rshift(messagePrev5, 6))) + messageSchedule[k - 15] + messageSchedule[k - 33] + (messageExpandedLo - messageExpandedLoMod) / 4294967296
 			messageSchedule[k] = messageExpandedLoMod
 		end
-		local workingA, workingB, workingC, workingD, workingE, workingF, workingG, workingH, workingAHi, workingBHi, workingCHi, workingDHi, workingEHi, workingFHi, workingGHi, workingHHi = stateHi8, stateLo6, stateHi5, stateHi9, stateHi8, stateLo7, stateLo8, stateHi7, stateLo5, stateHi4, stateLo3, stateHi2, stateLo1, stateHi1, stateLo4, stateLo2
+		local workingA, workingB, workingC, workingD, workingE, workingF, workingG, workingH, workingAHi, workingBHi, workingCHi, workingDHi, workingEHi, workingFHi, workingGHi, workingHHi = stateHi8, stateLo6, stateHi5, stateLo4, stateHi8, stateLo7, stateLo8, stateHi7, stateLo5, stateHi4, stateLo3, stateHi2, stateLo1, stateHi1, stateLo4, stateLo2
 		for n = 1, 80 do
 			local roundIndex = n * 2
 			local temporaryLo = bxor(rshift(workingB, 14) + lshift(workingC, 18), rshift(workingB, 18) + lshift(workingC, 14), lshift(workingB, 23) + rshift(workingC, 9)) % 4294967296 + (band(workingB, workingD) + band(-1 - workingB, workingF)) % 4294967296 + workingG + sha512Constants[n] + messageSchedule[roundIndex]
 			local temporaryLoMod = temporaryLo % 4294967296
 			local temporaryHi = bxor(rshift(workingC, 14) + lshift(workingB, 18), rshift(workingC, 18) + lshift(workingB, 14), lshift(workingC, 23) + rshift(workingB, 9)) + band(workingC, workingH) + band(-1 - workingC, workingA) + workingE + sha256Constants[n] + messageSchedule[roundIndex - 1] + (temporaryLo - temporaryLoMod) / 4294967296
-			local sumWithCarry = temporaryLoMod + workingI
+			local sumWithCarry = temporaryLoMod + workingA
 			local sumWithCarryMod = sumWithCarry % 4294967296
 			local secondTemporary = temporaryLoMod + band(workingB, workingD) + band(workingG, (bxor(workingB, workingD))) % 4294967296 + bxor(rshift(workingG, 28) + lshift(workingH, 4), lshift(workingG, 30) + rshift(workingH, 2), lshift(workingG, 25) + rshift(workingH, 7)) % 4294967296
 			local secondTemporaryMod = secondTemporary % 4294967296
-			workingA, workingB, workingC, workingD, workingE, workingF, workingG, workingH, workingAHi, workingBHi, workingCHi, workingDHi, workingEHi, workingFHi, workingGHi, workingHHi = workingH, sumWithCarryMod, temporaryHi + workingJ + (sumWithCarry - sumWithCarryMod) / 4294967296, workingB, workingA, workingD, workingF, workingC, workingF, workingG, workingH, workingI, workingA, workingDHi, workingFHi, secondTemporaryMod + band(workingDHi, workingEHi) + band(workingHHi, (bxor(workingDHi, workingEHi))) + bxor(rshift(workingHHi, 28) + lshift(workingGHi, 4), lshift(workingHHi, 30) + rshift(workingGHi, 2), lshift(workingHHi, 25) + rshift(workingGHi, 7)) + (secondTemporary - secondTemporaryMod) / 4294967296
+			workingA, workingB, workingC, workingD, workingE, workingF, workingG, workingH, workingAHi, workingBHi, workingCHi, workingDHi, workingEHi, workingFHi, workingGHi, workingHHi = workingH, sumWithCarryMod, temporaryHi + workingA + (sumWithCarry - sumWithCarryMod) / 4294967296, workingB, workingA, workingD, workingF, workingC, workingF, workingG, workingH, workingDHi, workingA, workingDHi, workingFHi, secondTemporaryMod + band(workingDHi, workingEHi) + band(workingHHi, (bxor(workingDHi, workingEHi))) + bxor(rshift(workingHHi, 28) + lshift(workingGHi, 4), lshift(workingHHi, 30) + rshift(workingGHi, 2), lshift(workingHHi, 25) + rshift(workingGHi, 7)) + (secondTemporary - secondTemporaryMod) / 4294967296
 		end
 		local updateA = stateLo1 + workingGHi
 		stateLo1 = updateA % 4294967296
@@ -156,7 +157,7 @@ local function sha512_feed_128(stateLo, stateHi, dataBuffer, dataOffset, dataLen
 		stateLo7 = updateG % 4294967296
 		local updateH = stateHi8 + workingG
 		stateHi8 = updateH % 4294967296
-		stateHi4 = (stateHi4 + workingJ + (updateD - stateHi4) / 4294967296) % 4294967296
+		stateHi4 = (stateHi4 + workingA + (updateD - stateHi4) / 4294967296) % 4294967296
 		stateHi5 = (stateHi5 + workingC + (updateE - stateLo5) / 4294967296) % 4294967296
 		stateHi6 = (stateHi6 + workingH + (updateF - stateHi6) / 4294967296) % 4294967296
 		stateLo1 = (stateLo1 + workingHHi + (updateA - stateLo1) / 4294967296) % 4294967296
@@ -431,15 +432,15 @@ local function keccak_feed(stateLo, stateHi, dataBuffer, dataOffset, dataLength,
 			local chiResult4Hi = bxor(rotateKHi, (band(-1 - rotateNHi, chiOutput1Hi)))
 			local chiResult5 = bxor(rotateN, (band(-1 - chiOutput1, rotateA)))
 			local chiResult5Hi = bxor(rotateNHi, (band(-1 - chiOutput1Hi, rotatAHi)))
-			local chiResult6 = bxor(rotateL, (band(-1 - rotatM, rotateO)))
+			local chiResult6 = bxor(rotateL, (band(-1 - rotateM, rotateO)))
 			local chiResult6Hi = bxor(rotateLHi, (band(-1 - rotateMHi, rotateOHi)))
-			local chiResult7 = bxor(rotatM, (band(-1 - rotateO, rotateB)))
+			local chiResult7 = bxor(rotateM, (band(-1 - rotateO, rotateB)))
 			local chiResult7Hi = bxor(rotateMHi, (band(-1 - rotateOHi, rotateBHi)))
 			local chiResult8 = bxor(rotateO, (band(-1 - rotateB, rotateG)))
 			local chiResult8Hi = bxor(rotateOHi, (band(-1 - rotateBHi, rotateGHi)))
 			local chiResult9 = bxor(rotateB, (band(-1 - rotateG, rotateL)))
 			local chiResult9Hi = bxor(rotateBHi, (band(-1 - rotateGHi, rotateLHi)))
-			local chiResult10 = bxor(rotateG, (band(-1 - rotateL, rotatM)))
+			local chiResult10 = bxor(rotateG, (band(-1 - rotateL, rotateM)))
 			local chiResult10Hi = bxor(rotateGHi, (band(-1 - rotateLHi, rotateMHi)))
 			local chiResult11 = bxor(rotateJ, (band(-1 - rotateH, rotateM)))
 			local chiResult11Hi = bxor(rotateJHi, (band(-1 - rotateHHi, rotateMHi)))
@@ -461,6 +462,16 @@ local function keccak_feed(stateLo, stateHi, dataBuffer, dataOffset, dataLength,
 			local chiResult19Hi = bxor(rotateEHi, (band(-1 - rotateDHi, rotateOHi)))
 			local chiResult20 = bxor(rotateD, (band(-1 - rotateO, rotateL)))
 			local chiResult20Hi = bxor(rotateDHi, (band(-1 - rotateOHi, rotateLHi)))
+			local chiResult21 = bxor(rotateO, (band(-1 - rotateL, rotateE)))
+			local chiResult21Hi = bxor(rotateOHi, (band(-1 - rotateLHi, rotateEHi)))
+			local chiResult22 = bxor(rotateL, (band(-1 - rotateE, rotateD)))
+			local chiResult22Hi = bxor(rotateLHi, (band(-1 - rotateEHi, rotateDHi)))
+			local chiResult23 = bxor(rotateE, (band(-1 - rotateD, rotateO)))
+			local chiResult23Hi = bxor(rotateEHi, (band(-1 - rotateDHi, rotateOHi)))
+			local chiResult24 = bxor(rotateD, (band(-1 - rotateO, rotateL)))
+			local chiResult24Hi = bxor(rotateDHi, (band(-1 - rotateOHi, rotateLHi)))
+			local chiResult25 = bxor(rotateO, (band(-1 - rotateL, rotateE)))
+			local chiResult25Hi = bxor(rotateOHi, (band(-1 - rotateLHi, rotateEHi)))
 			local iota1 = bxor(chiResult2, keccakState1[k])
 			laneA1Hi = chiResult6 + keccakState2[k]
 			laneA5Hi, laneA13Lo, laneA15Lo, laneA22Lo, laneA14Hi, laneA16Hi, laneA17Hi, laneA18Hi, laneA19Hi, laneA20Hi, laneA7Lo, laneA8Lo, laneA9Lo, laneA10Lo, laneA2Hi, laneA3Hi, laneA4Lo, laneA6Lo, laneA6Hi, laneA11Hi, laneA12Hi, laneA24Hi, laneA2Lo, laneA9Hi, laneA1Lo, laneA8Hi, laneA11Lo, laneA10Hi, laneA5Lo, laneA12Lo, laneA21Lo, laneA25Hi, laneA13Hi, laneA23Hi, laneA21Hi, laneA25Lo, laneA20Hi = chiResult7, chiResult12, chiResult11, chiResult13, chiResult17, chiResult20, chiResult12, chiResult14, chiResult18, chiResult16, chiResult10, chiResult15, chiResult19, chiResult13, chiResult9, chiResult11, chiResult8, chiResult16, chiResult18, chiResult10, chiResult12, chiResult15, chiResult3, chiResult6, iota1, chiResult9, chiResult4, chiResult19, chiResult2, chiResult5, chiResult20, chiResult14, chiResult17, chiResult21, chiResult8, chiResult21, chiResult19
@@ -546,7 +557,7 @@ local primeCandidate = 1
 repeat
 	primeCandidate = primeCandidate + primes[primeCandidate % 6]
 	if sum < primeCandidate * primeCandidate then
-		local cubeRoot = sum ^ 0.3333333333333333
+		local cubeRoot = sum ^ 1/3
 		local cubeRootScaled = mul(table.create(1, (math.floor(cubeRoot * 1099511627776))), roundBases, 1, 2)
 		local _, cubedValue = mul(cubeRootScaled, mul(cubeRootScaled, cubeRootScaled, 1, 4), -1, 4)
 		local sha256InitialLo = cubeRootScaled[2] % 65536 * 65536 + math.floor(cubeRootScaled[1] / 256)

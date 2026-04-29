@@ -17,17 +17,17 @@ return {
 		game:GetService("Debris"):AddItem(Part, 5)
 		local explosionParticles = ReplicatedStorage.Resource.ItemSystem.Projectiles.Explosion:Clone()
 		explosionParticles.Parent = Part
-		task.delay(0.03333333333333333, function()
+		task.delay(1/30, function()
 			explosionParticles:Emit(4)
 		end)
 		local debrisParticles = ReplicatedStorage.Resource.ItemSystem.Projectiles.Debris:Clone()
 		debrisParticles.Parent = Part
-		task.delay(0.03333333333333333, function()
+		task.delay(1/30, function()
 			debrisParticles:Emit(50)
 		end)
 		local smokeParticles = ReplicatedStorage.Resource.ItemSystem.Projectiles.Smoke:Clone()
 		smokeParticles.Parent = Part
-		task.delay(0.03333333333333333, function()
+		task.delay(1/30, function()
 			smokeParticles:Emit(3)
 		end)
 		local landingSmokeEffect = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()

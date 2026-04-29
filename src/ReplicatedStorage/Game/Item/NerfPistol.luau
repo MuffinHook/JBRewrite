@@ -22,7 +22,7 @@ function NerfPistol.ShootSound(gun, isAlternate)
 		Audio.ObjectLocal(gun.Tip, gun.Config.Sound.gun_pistol_shot_04, {
 			Pitch = 1
 		})
-		delay(0.1, function()
+		task.delay(0.1, function()
 			Audio.ObjectLocal(gun.Tip, gun.Config.Sound.gun_pistol_slide_fast_01, {
 				Volume = 0.3,
 				Pitch = 1 + math.random() * 0.1 - 0.05
@@ -37,10 +37,10 @@ function NerfPistol.ReloadRefillAmmoSound(gun)
 	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.gun_pistol_insert_mag_01, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.4)
+	task.wait(0.4)
 	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.gun_pistol_slide_fast_01, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.1)
+	task.wait(0.1)
 end
 return NerfPistol

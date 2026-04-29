@@ -188,13 +188,13 @@ function TurretClass.Stepped(turret)
 			turret.JointNeck.Transform = CFrame.Angles(verticalAngleRaw, 0, 0)
 			local spinSpeed = turret.SpringSpin:Update()
 			local totalSpin = turret.SpinTotal + deltaTime * spinSpeed
-			if totalSpin > 6.283185307179586 then
-				totalSpin = totalSpin - 6.283185307179586
+			if totalSpin > math.tau then
+				totalSpin = totalSpin - math.tau
 			end
 			turret.SpinTotal = totalSpin
 			turret.BarrelMotor.C1 = CFrame.Angles(0, 0, -16 * totalSpin)
 			turret.VerticalMotor.C1 = CFrame.Angles(verticalAngleRaw, 0, 0)
-			turret.HorizontalMotor.C1 = CFrame.Angles(0, (horizontalAngle + math.pi) % 6.283185307179586 - math.pi, 0)
+			turret.HorizontalMotor.C1 = CFrame.Angles(0, (horizontalAngle + math.pi) % math.tau - math.pi, 0)
 			turret:UpdateArmJoints()
 			turret:AnimateBarrel(deltaTime, spinSpeed)
 		end
@@ -225,7 +225,7 @@ function TurretClass.InputEnded(turret, inputData, p3)
 	if if inputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputData.UserInputType == Enum.UserInputType.Gamepad1 then inputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		turret.SpringSpin:SetTarget(0)
 		turret.MouseDown = false
-		delay(0.5, function()
+		task.delay(0.5, function()
 			if turret.Sound and not turret.MouseDown then
 				turret.Sound:Destroy()
 				turret.Sound = nil

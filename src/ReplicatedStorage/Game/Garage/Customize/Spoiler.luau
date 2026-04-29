@@ -31,7 +31,7 @@ return function(spoilerConfig, carData, colorData)
 				rotationCFrame = rotationCFrame * CFrame.Angles(math.pi, math.pi, 0)
 				finalSize = scaledSize
 			elseif spoilerType == "2Billion" then
-				rotationCFrame = rotationCFrame * CFrame.Angles(math.pi, 1.5707963267948966, 0.3)
+				rotationCFrame = rotationCFrame * CFrame.Angles(math.pi, math.pi / 2, 0.3)
 				finalSize = scaledSize
 			elseif spoilerType == "BlueChute" or spoilerType == "OrangeChute" then
 				local chuteBaseSize = Vector3.new(newSpoilerPart.Size.X, newSpoilerPart.Size.Y, newSpoilerPart.Size.Z)
@@ -95,7 +95,7 @@ return function(spoilerConfig, carData, colorData)
 					if not newSpoilerPart:IsDescendantOf(workspace) then
 						heartbeatConnection:Disconnect()
 					end
-					weldJoint.C1 = CFrame.Angles(0, os.clock() * 1.25 % 6.283185307179586, 0)
+					weldJoint.C1 = CFrame.Angles(0, os.clock() * 1.25 % math.tau, 0)
 				end)
 			end
 		end

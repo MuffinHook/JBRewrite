@@ -16,7 +16,7 @@ local function PlaySound(targetPart, soundId)
 	Sound.Volume = 0.75
 	Sound.Parent = targetPart
 	Sound:Play()
-	delay(1, function()
+	task.delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end
@@ -53,9 +53,8 @@ local function AddedLaserButton(laserPart)
 end
 return {
 	Init = function(config)
-		local eventManager = config.em
+		eventManager = config.em
 		jewelEvent = config.Event
-		eventManager = eventManager
 		local Sound = Instance.new("Sound")
 		Sound.SoundId = "rbxassetid://1837825257"
 		Sound.Looped = true
@@ -71,7 +70,7 @@ return {
 			task.wait(2)
 			Sound:Stop()
 		end
-		function em.kx2z39za(jewelPart)
+		function eventManager.kx2z39za(jewelPart)
 			task.delay(0.2, function()
 				jewelPart.Transparency = 0.25
 				TweenService:Create(jewelPart, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, false), {
@@ -79,12 +78,12 @@ return {
 				}):Play()
 			end)
 		end
-		function em.yo65te3x(shouldShake, jewelParts)
+		function eventManager.yo65te3x(shouldShake, jewelParts)
 			PlaySound(LocalPlayer, 1837831244)
-			delay(1, function()
+			task.delay(1, function()
 				PlaySound(LocalPlayer, 1843025542)
 			end)
-			spawn(FadeInSound)
+			task.spawn(FadeInSound)
 			if shouldShake then
 				for index, jewelPart in jewelParts do
 					jewelPart.CanCollide = true
@@ -109,8 +108,8 @@ return {
 				end)
 			end
 		end
-		function em.eckwjayf()
-			spawn(FadeOutSound)
+		function eventManager.eckwjayf()
+			task.spawn(FadeOutSound)
 		end
 		local nextIterator = next
 		local jewelList, endIndex = CollectionService:GetTagged("RobberyJewelryJewel")

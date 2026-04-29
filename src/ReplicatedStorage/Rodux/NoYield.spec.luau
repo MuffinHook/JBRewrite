@@ -16,7 +16,7 @@ return function()
  local executionCountAfterYield = 0
  local function testMethod()
  executionCountBeforeYield = executionCountBeforeYield + 1
- wait()
+ task.wait()
  executionCountAfterYield = executionCountAfterYield + 1
  end
  local didSucceed, errorMessage = pcall(NoYield, testMethod)

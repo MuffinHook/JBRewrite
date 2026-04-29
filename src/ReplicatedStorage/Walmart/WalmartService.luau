@@ -41,7 +41,7 @@ return {
 						displayStateMaid:DoCleaning()
 						WalmartGui.Enabled = false
 					end))
-					regionMaid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+					regionMaid:GiveTask(Interval.every(1/3):Connect(function()
 						playerDetectionRegion:Update({ Players.LocalPlayer })
 					end))
 					return regionMaid

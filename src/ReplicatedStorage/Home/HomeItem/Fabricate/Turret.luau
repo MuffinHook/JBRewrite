@@ -21,15 +21,15 @@ local function offsetLookAtTarget(self, targetDistance, p3, pitchX, pitchY, pitc
 		local horizontalDistance = pitchX * pitchX + pitchZ * pitchZ
 		local baseAngle = pitchZ < 0 and math.atan(pitchX / pitchZ) or math.pi - math.atan(-pitchX / pitchZ)
 		local elevationAngle = baseAngle + (self * self < horizontalDistance and math.asin(self / horizontalDistance ^ 0.5) or math.asin(horizontalDistance ^ 0.5 / self))
-		verticalComponent = pitchZ * math.cos(elevationAngle) + pitchX * math.sin(elevationAngle)
-		squaredDistance = pitchY * pitchY + verticalComponent * verticalComponent
+		local verticalComponent = pitchZ * math.cos(elevationAngle) + pitchX * math.sin(elevationAngle)
+		local squaredDistance = pitchY * pitchY + verticalComponent * verticalComponent
 		local rollAngle = verticalComponent < 0 and math.atan(-pitchY / verticalComponent) or math.atan(pitchY / verticalComponent)
 		return elevationAngle, rollAngle - (targetDistance * targetDistance < squaredDistance and math.asin(targetDistance / squaredDistance ^ 0.5) or math.asin(squaredDistance ^ 0.5 / targetDistance))
 	end
 end
 local function shortAngleDist(self, angleTarget)
-	local angleDiff = (angleTarget - self) % 6.283185307179586
-	return 2 * angleDiff % 6.283185307179586 - angleDiff
+	local angleDiff = (angleTarget - self) % math.tau
+	return 2 * angleDiff % math.tau - angleDiff
 end
 local function getNearestPlayer(self, maxDistance)
 	local closestDistance = maxDistance or (1 / 0)
@@ -114,8 +114,8 @@ return {
 			local relativePos = turretCFrame:PointToObjectSpace(targetPos)
 			local elevationAngle, rollAngle = offsetLookAtTarget(0.3935546875, 1.7648589611053467, nil, relativePos.x, relativePos.y, relativePos.z)
 			targetRollAngle = rollAngle
-			local angleOffset = (elevationAngle - targetElevationAngle) % 6.283185307179586
-			targetElevationAngle = targetElevationAngle + math.clamp(2 * angleOffset % 6.283185307179586 - angleOffset, -2.5132741228718345 * deltaTime, 2.5132741228718345 * deltaTime)
+			local angleOffset = (elevationAngle - targetElevationAngle) % math.tau
+			targetElevationAngle = targetElevationAngle + math.clamp(2 * angleOffset % math.tau - angleOffset, -2.5132741228718345 * deltaTime, 2.5132741228718345 * deltaTime)
 			local rollAngleTarget = rollAngleSpring:SetTarget(rollAngle)
 			local elevationAngleTarget = elevationAngleSpring:SetTarget(targetElevationAngle)
 			local recoilAmount = recoilSpring:Update()

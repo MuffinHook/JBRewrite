@@ -155,7 +155,7 @@ return {
 												attachmentEnd = beamTargeter:FindFirstChild("AttachmentEnd")
 												attachmentStart.WorldPosition = ownerUpperTorso.Position
 												attachmentEnd.WorldPosition = targetUpperTorso.Position
-												rotationAngle = 6.283185307179586 * (os.clock() % 2) / 2
+												rotationAngle = math.tau * (os.clock() % 2) / 2
 												clonedFlash.CFrame = CFrame.new(adjustedPosition) * CFrame.Angles(0, rotationAngle, 0)
 												elapsedTime = os.clock() - startTime
 												animationValue = 1 - (math.cos(elapsedTime) + 1) / 2
@@ -178,7 +178,7 @@ return {
 												attachmentEnd = beamTargeter:FindFirstChild("AttachmentEnd")
 												attachmentStart.WorldPosition = ownerUpperTorso.Position
 												attachmentEnd.WorldPosition = targetUpperTorso.Position
-												rotationAngle = 6.283185307179586 * (os.clock() % 2) / 2
+												rotationAngle = math.tau * (os.clock() % 2) / 2
 												clonedFlash.CFrame = CFrame.new(adjustedPosition) * CFrame.Angles(0, rotationAngle, 0)
 												elapsedTime = os.clock() - startTime
 												animationValue = 1 - (math.cos(elapsedTime) + 1) / 2

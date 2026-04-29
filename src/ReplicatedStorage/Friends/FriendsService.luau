@@ -41,14 +41,14 @@ function FriendsService.updateFriends(player)
 			local friendsTable = {}
 			while true do
 				for _index, friendInfo in friendsPageResult:GetCurrentPage() do
-					friendstable[friendInfo.Id] = true
+					friendsTable[friendInfo.Id] = true
 				end
 				if friendsPageResult.IsFinished then
 					FriendsService._cachedLocal[player.UserId] = friendsTable
 					FriendsService.friendsUpdated:Fire()
 					return FriendsService._cachedLocal[player.UserId]
 				end
-				friendspageResult:AdvanceToNextPageAsync()
+				friendsPageResult:AdvanceToNextPageAsync()
 			end
 		else
 			FriendsService._cachedLocal[player.UserId] = {}

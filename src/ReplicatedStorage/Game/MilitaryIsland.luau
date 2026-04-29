@@ -23,7 +23,7 @@ function MilitaryIslandModule.StartSpin(laserModel)
 		if not (Magnitude * Magnitude > 250000) then
 			debug.profilebegin("MilitaryIsland Laser Spin")
 			local currentTime = Time.GetNowSync()
-			laserModel:SetPrimaryPartCFrame(baseCFrame * CFrame.Angles(0, (currentTime + math.sin(2 * currentTime) * 0.1) * 1 % 6.283185307179586, 0))
+			laserModel:SetPrimaryPartCFrame(baseCFrame * CFrame.Angles(0, (currentTime + math.sin(2 * currentTime) * 0.1) * 1 % math.tau, 0))
 			debug.profileend()
 		end
 	end)

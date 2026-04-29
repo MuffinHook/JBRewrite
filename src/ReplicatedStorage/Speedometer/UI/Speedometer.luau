@@ -177,7 +177,7 @@ function component.render(self)
 				})
 			end
 			local mainFrameProps = {
-				BackgroundTransparency = 0.6666666666666666,
+				BackgroundTransparency = 2/3,
 				BackgroundColor3 = Color3.new(51/255, 51/255, 51/255),
 				Size = self.props.size,
 				Position = self.props.position,
@@ -380,7 +380,7 @@ function component.render(self)
 				BackgroundTransparency = 1
 			}
 			bottomSectionProps.Size = UDim2.new(1, 0, if smallUI then 1 else 0.5714285714285714, 0)
-			bottomSectionProps.Position = UDim2.new(0, 0, if smallUI then 0.7272727272727273 else 0.5714285714285714, 0)
+			bottomSectionProps.Position = UDim2.new(0, 0, if smallUI then 8/11 else 0.5714285714285714, 0)
 			local bottomSectionChildren = {
 				Line0 = createElement("Frame", {
 					BorderSizePixel = 0,

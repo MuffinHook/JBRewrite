@@ -1,9 +1,9 @@
 --!strict
 local Rodux = require(script.Parent.Parent.Rodux)
 
-type Action = Rodux.Action<string>
-type ThunkAction<ReturnType, State> = Rodux.ThunkAction<ReturnType, State>
-type ActionCreator<Type, Action, Args...> = Rodux.ActionCreator<Type, Action, Args...>
+type Action = { type: string }
+type ThunkAction<ReturnType, State> = (State) -> ReturnType
+type ActionCreator<Type, Payload> = ((Payload) -> Action) & { name: Type }
 
 export type DispatchProp = <Payload>(action: Payload & Action) -> ()
 

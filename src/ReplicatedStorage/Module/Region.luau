@@ -17,8 +17,6 @@ local function MakePrism()
 end
 local function MakePrismA(cframe, size)
 	return {
-		cframe = nil,
-		size = nil,
 		cframe = cframe,
 		size = size
 	}

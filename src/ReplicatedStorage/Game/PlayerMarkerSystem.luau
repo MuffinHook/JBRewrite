@@ -68,7 +68,7 @@ function PlayerMarkerSystem._draw()
 					local positionObj = Humanoid:FindFirstChild(HumanoidUnloadConsts.SERVER_POSITION_OBJ_NAME)
 					if positionObj then
 						local positionValue = positionObj.Value
-						_worldMarker:SetPosition(((markerRecord._worldMarker:GetPosition() or positionValue):Lerp(positionValue, 0.3333333333333333)))
+						_worldMarker:SetPosition(((markerRecord._worldMarker:GetPosition() or positionValue):Lerp(positionValue, 1/3)))
 					end
 				end
 			end

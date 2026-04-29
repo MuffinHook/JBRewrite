@@ -11,9 +11,9 @@ function BattleRobberyStatusComponent.render(self)
 		BorderSizePixel = 0
 	}
 	statusFrameProps.BackgroundColor3 = if self.props.robberyCompleted then ColorUtils.brightenBy(identityColor, -0.1) else self.props.backgroundColor
-	statusFrameProps.Size = UDim2.new(1, 0, 0.6666666666666666, 0)
+	statusFrameProps.Size = UDim2.new(1, 0, 2/3, 0)
 	statusFrameProps.AnchorPoint = Vector2.new(0, 0)
-	statusFrameProps.Position = UDim2.new(0, 0, 0.6666666666666666 * (rowIndex - 1) + 1, 2.6666666666666665 * rowIndex)
+	statusFrameProps.Position = UDim2.new(0, 0, 2/3 * (rowIndex - 1) + 1, 8/3 * rowIndex)
 	local statusContainerChildren = {
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)

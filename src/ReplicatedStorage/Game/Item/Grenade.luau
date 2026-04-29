@@ -20,7 +20,7 @@ local function CalculateProjectileVelocity(startPosition, targetPosition, projec
 		local sqrtDisc = discriminant ^ 0.5
 		launchAngle = math.min(math.atan((projectileSpeed * projectileSpeed + sqrtDisc) / (Gravity * horizontalDist)), (math.atan((projectileSpeed * projectileSpeed - sqrtDisc) / (Gravity * horizontalDist))))
 	else
-		launchAngle = 0.7853981633974483
+		launchAngle = math.pi / 4
 	end
 	return Vector3.new(projectileSpeed * displacement.x / horizontalDist * math.cos(launchAngle), projectileSpeed * math.sin(launchAngle), projectileSpeed * displacement.z / horizontalDist * math.cos(launchAngle)), horizontalDist / (projectileSpeed * math.cos(launchAngle))
 end
@@ -72,7 +72,7 @@ local function GrenadeExplode(grenadeInstance, grenadeModel)
 	local landingSmokeEffect = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
 	landingSmokeEffect.Enabled = true
 	landingSmokeEffect.Parent = Part
-	delay(5 - landingSmokeEffect.Lifetime.Max, function()
+	task.delay(5 - landingSmokeEffect.Lifetime.Max, function()
 		landingSmokeEffect.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 5)
@@ -95,17 +95,17 @@ function t.GrenadeThrow(grenadeInstance, targetPosition, fuseTime)
 	PrimaryPart.Velocity = CalculateProjectileVelocity(grenadeInstance.Model.Skeleton.BoundingBox.Position, targetPosition, 100)
 	grenadeModel:SetPrimaryPartCFrame(CFrame.new(Vector3.new(), PrimaryPart.Velocity) + grenadeInstance.Model.Skeleton.BoundingBox.Position)
 	PrimaryPart.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.9, 0.5, 20, 1)
-	delay(0, function()
+	task.delay(0, function()
 		PrimaryPart.CanCollide = true
 	end)
-	delay(fuseTime, function()
+	task.delay(fuseTime, function()
 		GrenadeExplode(grenadeInstance, grenadeModel)
 		grenadeModel.Model.Base.CanCollide = true
 		local randomX = math.random() * 2 - 1
 		local randomY = math.random() * 2 - 1
 		grenadeModel.Model.Base.Velocity = Vector3.new(randomX, randomY, math.random() * 2 - 1).Unit * 50
 	end)
-	delay(fuseTime + 2, function()
+	task.delay(fuseTime + 2, function()
 		grenadeModel:Destroy()
 	end)
 	if grenadeInstance.Local then
@@ -133,11 +133,11 @@ function t.ShootBegin(grenadeInstance, inputDirection)
 	local dropX = math.random() * 2 - 1
 	local dropY = math.random() * 2 - 1
 	detachedHandle.Velocity = Vector3.new(dropX, dropY, math.random() * 2 - 1).Unit * 50
-	delay(5, function()
+	task.delay(5, function()
 		detachedHandle:Destroy()
 	end)
 	grenadeInstance.Model.Model.Handle.Transparency = 1
-	delay(grenadeInstance.Config.FuseTime, function()
+	task.delay(grenadeInstance.Config.FuseTime, function()
 		if not grenadeInstance.Destroyed then
 			if grenadeInstance.ShootProxy ~= proxyIncrement then
 				return false
@@ -158,7 +158,7 @@ function t.ShootEnd(grenadeInstance, inputDirection)
 	grenadeInstance.SpringItemOffset:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.ItemOffset)
 	grenadeInstance.SpringItemRotation:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.ItemRotation)
 	grenadeInstance.SpringNeckRotation:SetTarget(grenadeInstance.Config.Motion.Launch.Springs.NeckRotation)
-	delay(0.2, function()
+	task.delay(0.2, function()
 		grenadeInstance.SpringItemOffset:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.ItemOffset)
 		grenadeInstance.SpringItemRotation:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.ItemRotation)
 		grenadeInstance.SpringNeckRotation:SetTarget(grenadeInstance.Config.Motion.Hip.Springs.NeckRotation)
@@ -166,7 +166,7 @@ function t.ShootEnd(grenadeInstance, inputDirection)
 	local Model = grenadeInstance.Model
 	Model.Model.Base.Transparency = 1
 	Model.Model.Handle.Transparency = 1
-	delay(grenadeInstance.Config.ReloadTime, function()
+	task.delay(grenadeInstance.Config.ReloadTime, function()
 		if grenadeInstance.Destroyed then
 			return false
 		end

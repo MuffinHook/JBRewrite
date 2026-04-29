@@ -4,7 +4,7 @@ local RunUtils = require(ReplicatedStorage.App.RunUtils)
 local function Ease_InOutQuad(progress)
 	return progress < 0.5 and 2 * progress * progress or -1 - 2 * (progress - 2) * progress
 end
-local Drawbridge = {}
+local Drawbridge = { Door0 = nil}
 Drawbridge.__index = Drawbridge
 function Drawbridge.new(model, hinge)
 	assert(model ~= nil)
@@ -64,8 +64,8 @@ local DrawbridgeModule = {
 }
 function DrawbridgeModule.Init(module)
 	task.spawn(DrawbridgeModule._initSpawned, DrawbridgeModule)
-	function module.em.fbs2dwjk(module)
-		if module then
+	function module.em.fbs2dwjk(open)
+		if open then
 			DrawbridgeModule.Open()
 		else
 			DrawbridgeModule.Close()

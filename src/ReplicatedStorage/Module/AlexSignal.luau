@@ -33,8 +33,6 @@ function Signal.Listen(signalName, callback)
 		listenerID = ("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", function(character)
 			return ("%x"):format(character == "x" and random(0, 15) or random(8, 11))
 		end),
-		Callback = nil,
-		SignalName = nil,
 		SignalName = signalName,
 		Callback = callback
 	}

@@ -24,11 +24,11 @@ local function New(targetValue)
 			local scaledAcceleration = (currentVelocity / speed + damper * offsetFromTarget) / dampingRatio
 			local cosineValue = cos(dampingRatio * speed * elapsedTime)
 			local sineValue = sin(dampingRatio * speed * elapsedTime)
-			local exponentialDecay = 2.718281828459045 ^ (damper * speed * elapsedTime)
+			local exponentialDecay = math.exp(1) ^ (damper * speed * elapsedTime)
 			return targetPosition + (offsetFromTarget * cosineValue + scaledAcceleration * sineValue) / exponentialDecay, speed * ((dampingRatio * scaledAcceleration - damper * offsetFromTarget) * cosineValue - (dampingRatio * offsetFromTarget + damper * scaledAcceleration) * sineValue) / exponentialDecay
 		else
 			local adjustedVelocity = currentVelocity / speed + offsetFromTarget
-			local exponentialDecay = 2.718281828459045 ^ (speed * elapsedTime)
+			local exponentialDecay = math.exp(1) ^ (speed * elapsedTime)
 			return targetPosition + (offsetFromTarget + adjustedVelocity * speed * elapsedTime) / exponentialDecay, speed * (adjustedVelocity - offsetFromTarget - adjustedVelocity * speed * elapsedTime) / exponentialDecay
 		end
 	end

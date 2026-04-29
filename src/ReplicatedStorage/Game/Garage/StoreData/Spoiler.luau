@@ -829,7 +829,7 @@ return {
 			Season = 11,
 			SeasonIconId = 10529388580,
 			TopPct = 2,
-			PctScale = Vector3.new(-0.33333334, -0.33333334, -0.33333334)
+			PctScale = Vector3.new(-1/3, -1/3, -1/3)
 		},
 		{
 			FlipX = true,
@@ -862,7 +862,7 @@ return {
 			FlipX = true,
 			FlipY = true,
 			Name = "Terminator",
-			PctScale = Vector3.new(-0.083333336, -0.083333336, -0.083333336)
+			PctScale = Vector3.new(-1/12, -1/12, -1/12)
 		},
 		{
 			FlipX = true,
@@ -1233,6 +1233,6 @@ return {
 	end,
 	Update = function(spoilerInstance, sizeReference)
 		local elapsedTime = os.clock() / 2
-		spoilerInstance.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, sizeReference.Size.Magnitude * 0.707)
+		spoilerInstance.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5, 0, 0) * CFrame.new(0, 0, sizeReference.Size.Magnitude * 0.707)
 	end
 }

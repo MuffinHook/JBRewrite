@@ -18,7 +18,7 @@ return {
 			end)
 		end
 		function signal.wait(self)
-			instance.Event:wait()
+			instance.Event:Wait()
 			assert(args, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
 			return unpack(args, 1, argCount)
 		end

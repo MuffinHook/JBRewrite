@@ -30,7 +30,7 @@ function tbl.explodeAt(explosionPosition)
 	local landingSmokeEmitter = ReplicatedStorage.Resource.ItemSystem.Projectiles.LandingSmoke:Clone()
 	landingSmokeEmitter.Enabled = true
 	landingSmokeEmitter.Parent = Part
-	delay(10 - landingSmokeEmitter.Lifetime.Max, function()
+	task.delay(10 - landingSmokeEmitter.Lifetime.Max, function()
  landingSmokeEmitter.Enabled = false
 	end)
 	game.Debris:AddItem(Part, 10)

@@ -286,9 +286,10 @@ function HomeApp.render(self)
 		}
 
 		local gridContainer = nil
-		local categoryTitle = nil
+		local _categoryTitle = nil
 		local searchQuery = (self.state.search or ""):lower():gsub(" ", "")
 		local hasSearch = #searchQuery > 0
+		local selectedItem = nil
 
 		if self.state.pageName == "inventory" or self.state.pageName == "store" then
 			local filteredItems = {}
@@ -308,7 +309,6 @@ function HomeApp.render(self)
 			end
 
 			local itemMetadata = {}
-			local selectedItem = nil
 			for filteredIndex, item in filteredItems do
 				local countLabel = nil
 				if item.module == "HomeItem" then
@@ -366,7 +366,7 @@ function HomeApp.render(self)
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
-				position = UDim2.fromScale(0, 0.16499999999999998),
+				position = UDim2.fromScale(0, 0.165),
 				paddingTop = 0.5,
 				paddingBottom = 0,
 				paddingLeft = 0,
@@ -464,7 +464,7 @@ function HomeApp.render(self)
 				backgroundTransparency = 0,
 				backgroundColor = Color3.new(51/255, 51/255, 51/255),
 				size = UDim2.fromScale(1, 0.8350000000000001),
-				position = UDim2.fromScale(0, 0.16499999999999998),
+				position = UDim2.fromScale(0, 0.165),
 				paddingTop = 0.5,
 				paddingBottom = 0,
 				paddingLeft = 0,
@@ -486,7 +486,7 @@ function HomeApp.render(self)
 				})
 			})
 		else
-			local isPageName = self.state.pageName == "edit"
+			local _isPageName = self.state.pageName == "edit"
 		end
 
 		local actionButtonElements = {}
@@ -587,7 +587,7 @@ function HomeApp.render(self)
 			}, {
 				Title = createElement(PaddedContainer, {
 					backgroundTransparency = 1,
-					size = UDim2.fromScale(1, 0.16499999999999998),
+					size = UDim2.fromScale(1, 0.165),
 					paddingTop = 0,
 					paddingLeft = 0,
 					paddingRight = 0,
@@ -613,7 +613,7 @@ function HomeApp.render(self)
 				Pages = createElement(PaddedContainer, {
 					backgroundTransparency = 1,
 					size = UDim2.fromScale(1, 0.275),
-					position = UDim2.fromScale(0, 0.16499999999999998),
+					position = UDim2.fromScale(0, 0.165),
 					paddingTop = 0,
 					paddingLeft = 0,
 					paddingRight = 0,
@@ -756,6 +756,7 @@ function HomeApp.render(self)
 		searchConnection:Disconnect()
 	end
 	searchConnection = false
+	return nil
 end
 
 return RoactRodux.connect(function(state, props)

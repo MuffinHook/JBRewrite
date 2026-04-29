@@ -9,12 +9,12 @@ function WelcomeComponent.render(self)
 	return createElement("Frame", {
 		BackgroundTransparency = 0.8,
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-		Size = UDim2.new(0.36363636363636365, 0, 1, 0),
+		Size = UDim2.new(4/11, 0, 1, 0),
 		Position = UDim2.fromScale(0.5, 0.5),
 		AnchorPoint = Vector2.new(0.5, 0.5)
 	}, {
 		AspectRatio = createElement("UIAspectRatioConstraint", {
-			AspectRatio = 1.7777777777777777
+			AspectRatio = 16/9
 		}),
 		UICorners = createElement("UICorner", {
 			CornerRadius = UDim.new(0, 4)
@@ -22,7 +22,7 @@ function WelcomeComponent.render(self)
 		ContainerMessage = createElement(PaddedContainer, {
 			backgroundTransparency = 1,
 			verticalPaddingRatio = 96,
-			aspectRatio = 1.7777777777777777
+			aspectRatio = 16/9
 		}, {
 			Topbar = createElement(PaddedContainer, {
 				backgroundTransparency = 0,

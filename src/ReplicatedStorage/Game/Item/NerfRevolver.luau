@@ -22,7 +22,7 @@ function NerfRevolver.ShootSound(gun, isLocalShot)
 		Audio.ObjectLocal(gun.Tip, gun.Config.Sound.shoot, {
 			Pitch = 1
 		})
-		delay(0.1, function()
+		task.delay(0.1, function()
 			Audio.ObjectLocal(gun.Tip, gun.Config.Sound.bullet_case, {
 				Volume = 0.4,
 				Pitch = 1 + math.random() * 0.1 - 0.05
@@ -42,12 +42,12 @@ function NerfRevolver.ReloadRefillAmmoSound(gun)
 		Audio.ObjectLocal(gun.Tip, gun.Config.Sound.bullet_insert, {
 			RollOffMaxDistance = 129
 		})
-		wait(0.2)
+		task.wait(0.2)
 	end
 	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.reload_close, {
 		RollOffMaxDistance = 129
 	})
-	wait(0.2)
+	task.wait(0.2)
 	Audio.ObjectLocal(gun.Tip, gun.Config.Sound.cylinder_spin, {
 		RollOffMaxDistance = 129
 	})

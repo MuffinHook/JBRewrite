@@ -30,7 +30,7 @@ local function FlareCrossHair(crosshairConfig)
 	VerticalBottom.BackgroundColor3 = redColor
 	HorizontalLeft.BackgroundColor3 = redColor
 	HorizontalRight.BackgroundColor3 = redColor
-	delay(0.1, function()
+	task.delay(0.1, function()
 		if crosshairConfig.Int == updateCounter then
 			VerticalTop.BackgroundColor3 = whiteColor
 			VerticalBottom.BackgroundColor3 = whiteColor

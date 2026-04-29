@@ -43,6 +43,6 @@ return {
 	end,
 	Update = function(suspension, suspensionDimensions)
 		local elapsedTime = os.clock() / 2
-		suspension.CFrame = CFrame.Angles(0, elapsedTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, suspensionDimensions.Size.Magnitude)
+		suspension.CFrame = CFrame.Angles(0, elapsedTime % math.tau, 0) * CFrame.Angles(math.sin(elapsedTime) * 0.5 - 0.2, 0, 0) * CFrame.new(0, 0, suspensionDimensions.Size.Magnitude)
 	end
 }

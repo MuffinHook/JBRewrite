@@ -324,7 +324,7 @@ end
 	```lua
 	local myFunction()
 		return Promise.new(function(resolve, reject, onCancel)
-			wait(1)
+			task.wait(1)
 			resolve("Hello world!")
 		end)
 	end
@@ -1065,7 +1065,7 @@ do
 	function Promise.delay(seconds)
 		assert(type(seconds) == "number", "Bad argument #1 to Promise.delay, must be a number.")
 		-- If seconds is -INF, INF, NaN, or less than 1 / 60, assume seconds is 1 / 60.
-		-- This mirrors the behavior of wait()
+		-- This mirrors the behavior of task.wait()
 		if not (seconds >= 1 / 60) or seconds == math.huge then
 			seconds = 1 / 60
 		end

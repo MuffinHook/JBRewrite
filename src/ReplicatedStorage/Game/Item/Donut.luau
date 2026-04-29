@@ -39,7 +39,7 @@ end
 function DonutClass.InputBegan(self, userInputData, p3)
 	if if userInputData.UserInputType == Enum.UserInputType.MouseButton1 then true elseif userInputData.UserInputType == Enum.UserInputType.Gamepad1 then userInputData.KeyCode == Enum.KeyCode.ButtonR2 else false then
 		self.SpringItemRotation:SetTarget(self.Config.Motion.Eat.Springs.ItemRotation)
-		delay(0.3, function()
+		task.delay(0.3, function()
 			self.SpringItemRotation:SetTarget(self.Config.Motion.Hip.Springs.ItemRotation)
 			if self.Local then
 				local currentTime = tick()

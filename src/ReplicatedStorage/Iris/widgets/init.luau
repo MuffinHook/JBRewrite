@@ -335,7 +335,7 @@ return function(iris)
 					return widget.lastCtrlClickedTick == iris._cycleTick
 				end
 			}
-		}
+		end,
 	}
 	iris._utility = utilities
 	require(script.Root)(iris, utilities)

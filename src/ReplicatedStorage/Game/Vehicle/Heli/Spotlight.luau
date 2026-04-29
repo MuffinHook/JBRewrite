@@ -9,7 +9,7 @@ local Spring = require(ReplicatedStorage.Std.Spring)
 local Math = require(ReplicatedStorage.Module.Math)
 local InputUtils = require(ReplicatedStorage.Std.InputUtils)
 local function ShortestAngle(angle, otherAngle)
-	return (angle - otherAngle + math.pi) % 6.283185307179586 - math.pi + otherAngle
+	return (angle - otherAngle + math.pi) % math.tau - math.pi + otherAngle
 end
 local function LookAt(position, targetPosition)
 	local Unit = (targetPosition - position).Unit
@@ -177,7 +177,7 @@ function Spotlight.UpdateMousePosition(self)
 	self:SetDistance(Magnitude)
 	local eulerX, eulerY, eulerZ = self.SpotlightMotor.Part1.CFrame:ToObjectSpace(LookAt(self.SpotlightMotor.Part1.Position, targetWorldPosition)):ToEulerAnglesXYZ()
 	local x = self.SpringAngles:Update().x
-	local newAngles = Vector3.new((eulerX - x + math.pi) % 6.283185307179586 - math.pi + x, eulerY, eulerZ)
+	local newAngles = Vector3.new((eulerX - x + math.pi) % math.tau - math.pi + x, eulerY, eulerZ)
 	self:SetAngles(newAngles)
 	local currentTime = tick()
 	if currentTime - self.LastUpdateAngleDistance > 0.125 then

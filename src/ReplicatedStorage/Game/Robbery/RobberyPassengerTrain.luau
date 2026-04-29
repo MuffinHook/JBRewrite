@@ -21,7 +21,7 @@ local function PlaySound(parent, soundId)
 	Sound.RollOffMode = Enum.RollOffMode.InverseTapered
 	Sound.Parent = parent
 	Sound:Play()
-	delay(1, function()
+	task.delay(1, function()
 		game.Debris:AddItem(Sound, Sound.TimeLength)
 	end)
 end

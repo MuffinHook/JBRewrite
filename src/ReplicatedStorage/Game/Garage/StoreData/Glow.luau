@@ -14,7 +14,7 @@ local function GetInstance(colorItem)
 end
 local function Update(glowPart, colorItem)
 	local rotationTime = os.clock() / 2
-	glowPart.CFrame = CFrame.Angles(0, rotationTime % 6.283185307179586, 0) * CFrame.Angles(math.sin(rotationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
+	glowPart.CFrame = CFrame.Angles(0, rotationTime % math.tau, 0) * CFrame.Angles(math.sin(rotationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, 8)
 end
 return {
 	Items = Color.Items,

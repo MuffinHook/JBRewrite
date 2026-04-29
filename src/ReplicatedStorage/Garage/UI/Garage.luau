@@ -129,7 +129,7 @@ function GarageComponent.render(self)
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-			Size = UDim2.new(0.13666666666666666, 0, 1, 0),
+			Size = UDim2.new(0.136667, 0, 1, 0),
 			LayoutOrder = 1
 		}
 		local leftPanelChildren = {
@@ -374,7 +374,7 @@ function GarageComponent.render(self)
 		local rightPanelProps = {
 			BackgroundTransparency = 1,
 			BackgroundColor3 = Color3.new(255/255, 255/255, 255/255),
-			Size = UDim2.new(0.13666666666666666, 0, 1, 0),
+			Size = UDim2.new(0.136667, 0, 1, 0),
 			LayoutOrder = 5
 		}
 		local rightPanelChildren = {
@@ -409,7 +409,7 @@ function GarageComponent.render(self)
 		}
 
 		local receiptProps = {
-			mainRatio = 1 / (2.4390243902439024 - (0.17597578573188333 + 1 / buttonGroupAspectRatio + 0.0508130081300813)),
+			mainRatio = 1 / (100/41 - (0.17597578573188333 + 1 / buttonGroupAspectRatio + 0.0508130081300813)),
 			cornerPixel = 4,
 			paddingRatio = 39.36,
 			layoutOrder = 6

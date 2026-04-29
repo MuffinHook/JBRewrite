@@ -9,7 +9,7 @@ return function(mountTarget)
 		local tradeItemData = OtherTradeServerUIData.otherTradeServerInfo[1]
 		tradeItemData.size = UDim2.fromScale(0.8, 0.1)
 		tradeItemData.verticalPaddingRatio = 128
-		tradeItemData.aspectRatio = 1.7777777777777777
+		tradeItemData.aspectRatio = 16/9
 		return Roact.createElement(OtherTradeServerItem, tradeItemData, {
 			Aspect = Roact.createElement("UIAspectRatioConstraint", {
 				AspectRatio = 8

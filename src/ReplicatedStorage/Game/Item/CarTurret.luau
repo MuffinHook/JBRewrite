@@ -175,8 +175,8 @@ function CarTurret.Stepped(self)
 		self.LastUpdate = currentTime
 		local spinVelocity = self.SpringSpin:Update()
 		local newSpinTotal = self.SpinTotal + deltaTime * spinVelocity
-		if newSpinTotal > 6.283185307179586 then
-			newSpinTotal = newSpinTotal - 6.283185307179586
+		if newSpinTotal > math.tau then
+			newSpinTotal = newSpinTotal - math.tau
 		end
 		self.SpinTotal = newSpinTotal
 		self:AnimateBarrel(deltaTime, spinVelocity)
@@ -215,7 +215,7 @@ function CarTurret.InputEnded(self, inputObject, gameProcessed)
 	if inputObject.UserInputType == Enum.UserInputType.MouseButton1 then
 		self.SpringSpin:SetTarget(0)
 		self.MouseDown = false
-		delay(0.5, function()
+		task.delay(0.5, function()
 			if self.Sound and not self.MouseDown then
 				self.Sound:Destroy()
 				self.Sound = nil

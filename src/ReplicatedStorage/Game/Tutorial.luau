@@ -131,7 +131,7 @@ local function ProcessQueue()
 		screenGui.Icon:TweenPosition(UDim2.new(1, 0, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
 			screenGui.Icon.Visible = false
 		end)
-		wait(0.5)
+		task.wait(0.5)
 	else
 		screenGui.Icon.Position = UDim2.new(1, 0, 1, -266)
 	end
@@ -141,12 +141,12 @@ local function ProcessQueue()
 		local messageData = table.remove(messageQueue, 1)
 		screenGui.Message.Inner.Title.Text = messageData.Title
 		screenGui.Message.Inner.Body.Text = messageData.Body
-		wait(messageData.Duration)
+		task.wait(messageData.Duration)
 	end
 	screenGui.Message:TweenPosition(UDim2.new(1, 0, 1, -300), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true, function()
 		screenGui.Message.Visible = false
 	end)
-	wait(0.5)
+	task.wait(0.5)
 	screenGui.Icon.Visible = true
 	screenGui.Icon:TweenPosition(UDim2.new(1, -40, 1, -266), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.5, true)
 	isQueueProcessing = false
@@ -155,7 +155,7 @@ local function ShowMessage(messageData)
 	table.insert(messageQueue, messageData)
 	if not isQueueProcessing then
 		isQueueProcessing = true
-		spawn(ProcessQueue)
+		task.spawn(ProcessQueue)
 	end
 end
 local function ShowNextMessage()
@@ -163,7 +163,7 @@ local function ShowNextMessage()
 	table.insert(messageQueue, Leaf)
 	if not isQueueProcessing then
 		isQueueProcessing = true
-		spawn(ProcessQueue)
+		task.spawn(ProcessQueue)
 	end
 end
 local function Complete(node)
@@ -172,7 +172,7 @@ local function Complete(node)
 	table.insert(messageQueue, Leaf)
 	if not isQueueProcessing then
 		isQueueProcessing = true
-		spawn(ProcessQueue)
+		task.spawn(ProcessQueue)
 	end
 end
 return {
@@ -182,14 +182,14 @@ return {
 		table.insert(messageQueue, tutorialTree.Welcome.Leaf)
 		if not isQueueProcessing then
 			isQueueProcessing = true
-			spawn(ProcessQueue)
+			task.spawn(ProcessQueue)
 		end
 		tutorialTree.Welcome:Complete()
 		local Leaf_2 = findNextActiveNode(tutorialTree.Welcome).Leaf
 		table.insert(messageQueue, Leaf_2)
 		if not isQueueProcessing then
 			isQueueProcessing = true
-			spawn(ProcessQueue)
+			task.spawn(ProcessQueue)
 		end
 		local lastClickTime = tick()
 		local function IconInputBegan(inputEvent)
@@ -203,7 +203,7 @@ return {
 				table.insert(messageQueue, Leaf)
 				if not isQueueProcessing then
 					isQueueProcessing = true
-					spawn(ProcessQueue)
+					task.spawn(ProcessQueue)
 				end
 			end
 		end
@@ -217,7 +217,7 @@ return {
 			table.insert(messageQueue, Leaf)
 			if not isQueueProcessing then
 				isQueueProcessing = true
-				spawn(ProcessQueue)
+				task.spawn(ProcessQueue)
 			end
 		end
 		screenGui.Icon.InputBegan:Connect(IconInputBegan)
@@ -234,7 +234,7 @@ return {
 						table.insert(messageQueue, Leaf)
 						if not isQueueProcessing then
 							isQueueProcessing = true
-							spawn(ProcessQueue)
+							task.spawn(ProcessQueue)
 						end
 					end
 				end

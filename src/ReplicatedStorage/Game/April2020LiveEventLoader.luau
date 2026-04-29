@@ -6,7 +6,7 @@ local function Check()
 	if April2020LiveEvent ~= nil then
 		initialized = true
 		local April2020LiveEvent_2 = April2020LiveEvent:WaitForChild("April2020LiveEvent")
-		wait(0.1)
+		task.wait(0.1)
 		require(April2020LiveEvent_2).Init(initData)
 		initData = nil
 		print("Loaded april 2020 live event")
@@ -18,12 +18,12 @@ local function Launch()
 		if not success then
 			warn(errorMessage)
 		end
-		wait(1)
+		task.wait(1)
 	end
 end
 return {
 	Init = function(receivedInitData)
 		initData = receivedInitData
-		spawn(Launch)
+		task.spawn(Launch)
 	end
 }

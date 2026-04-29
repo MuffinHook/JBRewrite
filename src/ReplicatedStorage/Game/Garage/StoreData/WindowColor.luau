@@ -20,7 +20,7 @@ local function GetInstance(colorConfig)
 end
 local function Update(instance, targetModel)
 	local animationTime = os.clock() / 2
-	instance.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(animationTime % 6.283185307179586) * 0.1, 0) * CFrame.Angles(math.sin(animationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, targetModel.BoundingBox.Size.Magnitude * 0.6)
+	instance.CFrame = CFrame.Angles(0, 2.356194490192345 + math.cos(animationTime % math.tau) * 0.1, 0) * CFrame.Angles(math.sin(animationTime) * 0.25 - 0.3, 0, 0) * CFrame.new(0, 0, targetModel.BoundingBox.Size.Magnitude * 0.6)
 end
 return {
 	Items = Color.Items,

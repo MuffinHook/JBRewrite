@@ -65,7 +65,7 @@ return {
 					title = markerId
 				})
 			end)
-			worldMarker._maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+			worldMarker._maid:GiveTask(Interval.every(1/3):Connect(function()
 				updatePositionBinding(markerInstance.Position)
 			end))
 			worldMarker:SetEnabled(isLocationMarkerEnabled)

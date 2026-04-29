@@ -417,7 +417,7 @@ function JetPack.HeartbeatLocal(packet, deltaTime)
 			JetPack.Unequip(LocalPlayer)
 		end
 	end
-	JetPack.LocalFuel = JetPack.LocalFuel - deltaTime * if packet.IsThrusting then 1 else 0.3333333333333333
+	JetPack.LocalFuel = JetPack.LocalFuel - deltaTime * if packet.IsThrusting then 1 else 1/3
 	if JetPack.LocalFuel < 0 then
 		JetPack.LocalFuel = 0
 		JetPack.Unequip(packet.Player)

@@ -88,7 +88,7 @@ function SmokeGrenade.ShootBegin(self, input)
 		self:DecrementAmmo()
 		eventSignal:FireServer("i4zp6p5r")
 		self:ReloadDropAmmoVisual()
-		delay(0.1, function()
+		task.delay(0.1, function()
 			if self.Destroyed then
 				return false
 			end

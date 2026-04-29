@@ -2,11 +2,11 @@ return {
 	NumPoints = 30,
 	data = {
 		{
-			tValue = 0.03333333333333333,
+			tValue = 1/30,
 			degrees = 0
 		},
 		{
-			tValue = 0.06666666666666667,
+			tValue = 1/15,
 			degrees = 0.00001
 		},
 		{
@@ -14,11 +14,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.13333333333333333,
+			tValue = 2/15,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.16666666666666666,
+			tValue = 1/6,
 			degrees = 0.00001
 		},
 		{
@@ -26,11 +26,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.23333333333333334,
+			tValue = 7/30,
 			degrees = -2.3946448438488135
 		},
 		{
-			tValue = 0.26666666666666666,
+			tValue = 4/15,
 			degrees = 0.00001
 		},
 		{
@@ -38,11 +38,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.3333333333333333,
+			tValue = 1/3,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.36666666666666664,
+			tValue = 11/30,
 			degrees = 0.00001
 		},
 		{
@@ -50,11 +50,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.43333333333333335,
+			tValue = 13/30,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.4666666666666667,
+			tValue = 7/15,
 			degrees = 0.00001
 		},
 		{
@@ -62,11 +62,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.5333333333333333,
+			tValue = 8/15,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.5666666666666667,
+			tValue = 17/30,
 			degrees = 0.00001
 		},
 		{
@@ -74,11 +74,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.6333333333333333,
+			tValue = 19/30,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.6666666666666666,
+			tValue = 2/3,
 			degrees = 0.00001
 		},
 		{
@@ -86,11 +86,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.7333333333333333,
+			tValue = 11/15,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.7666666666666667,
+			tValue = 23/30,
 			degrees = 0.00001
 		},
 		{
@@ -98,11 +98,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.8333333333333334,
+			tValue = 5/6,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.8666666666666667,
+			tValue = 13/15,
 			degrees = 0.00001
 		},
 		{
@@ -110,11 +110,11 @@ return {
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.9333333333333333,
+			tValue = 14/15,
 			degrees = 0.00001
 		},
 		{
-			tValue = 0.9666666666666667,
+			tValue = 29/30,
 			degrees = 0.012445331467531184
 		},
 		{

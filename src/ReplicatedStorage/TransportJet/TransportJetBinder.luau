@@ -206,7 +206,7 @@ function TransportJet._update(self)
 				self.jetEngineSound:Stop()
 				self.jetWindSound:Stop()
 			end)
-			local flightStartTime = os.clock() + (currentWorldPosition - workspace:GetServerTimeNow())
+			local flightStartTime = os.clock() - workspace:GetServerTimeNow()
 			runningMaid:GiveTask(RunService.Heartbeat:Connect(function()
 				local elapsedFrameTime = os.clock() - flightStartTime
 				local shouldTurbineRun = if doorDuration < elapsedFrameTime then elapsedFrameTime < doorDuration + totalFlightTime else false

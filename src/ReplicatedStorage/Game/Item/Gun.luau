@@ -417,7 +417,7 @@ function Gun.SetupBulletEmitter(self)
 			self.LastImpact = now
 			if hitPart:IsDescendantOf(workspace.Vehicles) then
 				local current = hitPart
-				loopCount = 0
+				local loopCount = 0
 				repeat
 					current = current.Parent
 					loopCount = loopCount + 1

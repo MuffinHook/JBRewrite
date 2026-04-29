@@ -56,7 +56,7 @@ local Mathf = {
 		return CFrame.new(Vector3.new(0, 0, 0), startVector):Lerp(CFrame.new(Vector3.new(0, 0, 0), endVector), progress).LookVector
 	end,
 	RandomizeVector = function(randomGenerator, magnitude, maxAngle)
-		local orientedFrame = CFrame.new(Vector3.new(), magnitude) * CFrame.Angles(0, 0, randomGenerator:NextNumber(0, 6.283185307179586))
+		local orientedFrame = CFrame.new(Vector3.new(), magnitude) * CFrame.Angles(0, 0, randomGenerator:NextNumber(0, math.tau))
 		local Angles = CFrame.Angles
 		return (orientedFrame * Angles(math.acos((randomGenerator:NextNumber(math.cos(maxAngle), 1))), 0, 0)).LookVector * magnitude.Magnitude
 	end,
@@ -86,7 +86,7 @@ local Mathf = {
 			local angleA = -math.asin(jointY / (jointX ^ 2 + jointY ^ 2) ^ 0.5)
 			local angleB, sinComponent
 			if jointX < objectSpacePoint.z then
-				angleB = -3.141592653589793 + math.asin(-jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5)
+				angleB = -math.pi + math.asin(-jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5)
 				if not angleB then
 					sinComponent = -jointY / ((objectSpacePoint.z - jointX) ^ 2 + jointY ^ 2) ^ 0.5
 					angleB = -math.asin(sinComponent)

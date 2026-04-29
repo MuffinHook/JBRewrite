@@ -72,7 +72,7 @@ function t.new(planeData, constOverrides)
 		CAMERA_SHAKE_MIN_GS = 1.5,
 		CAMERA_SHAKE_COEFF_GS = 1,
 		CAMERA_OFFSET_CF = CFrame.new(0, 8, 25),
-		SOUND_RUMBLE_COEFF_GS = 0.3333333333333333,
+		SOUND_RUMBLE_COEFF_GS = 1/3,
 		SOUND_BREATHING_MIN_GS = 1,
 		SOUND_BREATHING_TIMER = 2,
 		SOUND_BREATHING_DURATION = 3,
@@ -308,8 +308,8 @@ local function MountLocalPlayer(plane, seatInfo)
 			if now - throttleIdleTime > 1 and (not (breathingActiveTimer > plane.CONST.THROTTLE_TAKEOFF) and breathingActiveTimer > 0.15) then
 				breathingActiveTimer = breathingActiveTimer - dt * 0.1
 			end
-			if breathingActiveTimer < -0.06666666666666667 then
-				breathingActiveTimer = -0.06666666666666667
+			if breathingActiveTimer < -1/15 then
+				breathingActiveTimer = -1/15
 			end
 			if breathingActiveTimer > 1 then
 				breathingActiveTimer = 1

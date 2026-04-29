@@ -167,7 +167,7 @@ function robberyMarkerSystem.init()
 				title = robberyMarkerInstance.Name
 			})
 		end)
-		newWorldMarker._maid:GiveTask(Interval.every(0.3333333333333333):Connect(function()
+		newWorldMarker._maid:GiveTask(Interval.every(1/3):Connect(function()
 			updatePosition(robberyMarkerInstance.Position)
 		end))
 		local stateFolder = ReplicatedStorage:FindFirstChild(ROBBERY_STATE_FOLDER_NAME)
