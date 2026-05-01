@@ -1,75 +1,155 @@
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoactRodux = require(ReplicatedStorage.RoactRodux)
-local Maid = require(ReplicatedStorage.Std.Maid)
-local TableUtils = require(ReplicatedStorage.Std.TableUtils)
-local GameUtil = require(ReplicatedStorage.Game.GameUtil)
-local RunUtils = require(ReplicatedStorage.App.RunUtils)
-local Settings = require(ReplicatedStorage.Resource.Settings)
-local RxInstanceUtils = require(ReplicatedStorage.Std.RxInstanceUtils)
-local Dictionary = require(ReplicatedStorage.EzUi.Dictionary)
-local Utils = require(ReplicatedStorage.EzUi.Utils)
-local Notification = require(ReplicatedStorage.Game.Notification)
-local GamepassUtils = require(ReplicatedStorage.Gamepass.GamepassUtils)
-local CashBuyUI = require(ReplicatedStorage.Game.CashBuyUI)
-local Players = game:GetService("Players")
-local Roact = require(ReplicatedStorage.Roact)
+-- ── Services ─────────────────────────────────────────────────────────
+local Services = {
+	ReplicatedStorage = game:GetService("ReplicatedStorage"),
+	RunService        = game:GetService("RunService"),
+	UserInputService  = game:GetService("UserInputService"),
+	Players           = game:GetService("Players"),
+}
+
+local RS               = Services.ReplicatedStorage
+local RunService       = Services.RunService
+local UserInputService = Services.UserInputService
+local Players          = Services.Players
+
+-- ── Core modules ─────────────────────────────────────────────────────
+local Modules = {
+	RoactRodux                = require(RS.RoactRodux),
+	Roact                     = require(RS.Roact),
+	Maid                      = require(RS.Std.Maid),
+	TableUtils                = require(RS.Std.TableUtils),
+	RxInstanceUtils           = require(RS.Std.RxInstanceUtils),
+	Dictionary                = require(RS.EzUi.Dictionary),
+	Utils                     = require(RS.EzUi.Utils),
+	TabContainer              = require(RS.EzUi.TabContainer),
+	String                    = require(RS.Std.String),
+	InputUtils                = require(RS.Std.InputUtils),
+	GameUtil                  = require(RS.Game.GameUtil),
+	RunUtils                  = require(RS.App.RunUtils),
+	Settings                  = require(RS.Resource.Settings),
+	Notification              = require(RS.Game.Notification),
+	GamepassUtils             = require(RS.Gamepass.GamepassUtils),
+	CashBuyUI                 = require(RS.Game.CashBuyUI),
+	PlayerUtils               = require(RS.Game.PlayerUtils),
+	SidebarUI                 = require(RS.Game.SidebarUI),
+	VehicleUtils              = require(RS.Vehicle.VehicleUtils),
+	ActionButtonService       = require(RS.ActionButton.ActionButtonService),
+	Runtime                   = require(RS.ActionButton.UI.Runtime),
+	AdminPermUtils            = require(RS.App.AdminPermUtils),
+	SidebarHolder             = require(RS.App.UI.SidebarHolder),
+	BigButtonService          = require(RS.App.BigButtonService),
+	ItemUtils                 = require(RS.App.ItemUtils),
+	BigMinimap                = require(RS.App.UI.BigMinimap),
+	MinimapRodux              = require(RS.App.UI.MinimapRodux),
+	MinimapConsts             = require(RS.App.MinimapConsts),
+	MinimapService            = require(RS.App.MinimapService),
+	Bounty                    = require(RS.App.UI.Bounty),
+	CenterMessage             = require(RS.App.UI.CenterMessage),
+	TrackService              = require(RS.RaceTrack.TrackService),
+	Speedometer               = require(RS.Speedometer.UI.Speedometer),
+	SpeedometerUtils          = require(RS.Speedometer.SpeedometerUtils),
+	LicensePlate              = require(RS.Speedometer.UI.LicensePlate),
+	HotbarSystem              = require(RS.Hotbar.HotbarSystem),
+	Viewer                    = require(RS.CCTV.UI.Viewer),
+	CCTVService               = require(RS.CCTV.CCTVService),
+	CmdrExtSystem             = require(RS.CmdrExt.CmdrExtSystem),
+	GameSettingsService       = require(RS.GameSettings.GameSettingsService),
+	gameSettingType           = require(RS.GameSettings.gameSettingType),
+	store                     = require(RS.App.store),
+	Garage                    = require(RS.Garage.UI.Garage),
+	GarageUtils               = require(RS.Garage.GarageUtils),
+	GarageConsts              = require(RS.Garage.GarageConsts),
+	GarageConsts_2            = require(RS.Game.Garage.GarageConsts),
+	CasinoKeypad              = require(RS.Casino.UI.CasinoKeypad),
+	ChatUtils                 = require(RS.Chat.ChatUtils),
+	DamageIndicators          = require(RS.DamageIndicator.UI.DamageIndicators),
+	LikePromptRodux           = require(RS.LikePrompt.UI.LikePromptRodux),
+	Confirmation              = require(RS.Module.Confirmation),
+	Trade                     = require(RS.Trade.UI.Trade),
+	TradeInitiations          = require(RS.Trade.UI.TradeInitiations),
+	TradeResult               = require(RS.Trade.UI.TradeResult),
+	RewardSpinner             = require(RS.RewardSpinner.UI.RewardSpinner),
+	Safes                     = require(RS.Safes.UI.Safes),
+	SaleConsts                = require(RS.Sale.SaleConsts),
+	SpawnSelection            = require(RS.SpawnSelection.UI.SpawnSelection),
+	SpawnSelectionService     = require(RS.SpawnSelection.SpawnSelectionService),
+	ChooseSpawn               = require(RS.SpawnSelection.UI.ChooseSpawn),
+	SpawnSelectionConsts      = require(RS.SpawnSelection.SpawnSelectionConsts),
+	TooltipRodux              = require(RS.Tooltip.UI.TooltipRodux),
+	OtherTradeServerListRodux = require(RS.Trade.UI.OtherTradeServerListRodux),
+}
+
+require(RS.App.UI.TopbarHolder)
+require(RS.App.RunConsts)
+require(RS.Inventory.InventoryItemSystem)
+
+local RoactRodux                = Modules.RoactRodux
+local Roact                     = Modules.Roact
+local Maid                      = Modules.Maid
+local TableUtils                = Modules.TableUtils
+local RxInstanceUtils           = Modules.RxInstanceUtils
+local Dictionary                = Modules.Dictionary
+local Utils                     = Modules.Utils
+local TabContainer              = Modules.TabContainer
+local String                    = Modules.String
+local InputUtils                = Modules.InputUtils
+local GameUtil                  = Modules.GameUtil
+local RunUtils                  = Modules.RunUtils
+local Settings                  = Modules.Settings
+local Notification              = Modules.Notification
+local GamepassUtils             = Modules.GamepassUtils
+local CashBuyUI                 = Modules.CashBuyUI
+local PlayerUtils               = Modules.PlayerUtils
+local SidebarUI                 = Modules.SidebarUI
+local VehicleUtils              = Modules.VehicleUtils
+local ActionButtonService       = Modules.ActionButtonService
+local Runtime                   = Modules.Runtime
+local AdminPermUtils            = Modules.AdminPermUtils
+local SidebarHolder             = Modules.SidebarHolder
+local BigButtonService          = Modules.BigButtonService
+local ItemUtils                 = Modules.ItemUtils
+local BigMinimap                = Modules.BigMinimap
+local MinimapRodux              = Modules.MinimapRodux
+local MinimapConsts             = Modules.MinimapConsts
+local MinimapService            = Modules.MinimapService
+local Bounty                    = Modules.Bounty
+local CenterMessage             = Modules.CenterMessage
+local TrackService              = Modules.TrackService
+local Speedometer               = Modules.Speedometer
+local SpeedometerUtils          = Modules.SpeedometerUtils
+local LicensePlate              = Modules.LicensePlate
+local HotbarSystem              = Modules.HotbarSystem
+local Viewer                    = Modules.Viewer
+local CCTVService               = Modules.CCTVService
+local CmdrExtSystem             = Modules.CmdrExtSystem
+local GameSettingsService       = Modules.GameSettingsService
+local gameSettingType           = Modules.gameSettingType
+local store                     = Modules.store
+local Garage                    = Modules.Garage
+local GarageUtils               = Modules.GarageUtils
+local GarageConsts              = Modules.GarageConsts
+local GarageConsts_2            = Modules.GarageConsts_2
+local CasinoKeypad              = Modules.CasinoKeypad
+local ChatUtils                 = Modules.ChatUtils
+local DamageIndicators          = Modules.DamageIndicators
+local LikePromptRodux           = Modules.LikePromptRodux
+local Confirmation              = Modules.Confirmation
+local Trade                     = Modules.Trade
+local TradeInitiations          = Modules.TradeInitiations
+local TradeResult               = Modules.TradeResult
+local RewardSpinner             = Modules.RewardSpinner
+local Safes                     = Modules.Safes
+local SaleConsts                = Modules.SaleConsts
+local SpawnSelection            = Modules.SpawnSelection
+local SpawnSelectionService     = Modules.SpawnSelectionService
+local ChooseSpawn               = Modules.ChooseSpawn
+local SpawnSelectionConsts      = Modules.SpawnSelectionConsts
+local TooltipRodux              = Modules.TooltipRodux
+local OtherTradeServerListRodux = Modules.OtherTradeServerListRodux
+
+-- ── Roact / world setup ───────────────────────────────────────────────
 local createElement = Roact.createElement
-local VehicleUtils = require(ReplicatedStorage.Vehicle.VehicleUtils)
-local ActionButtonService = require(ReplicatedStorage.ActionButton.ActionButtonService)
-local Runtime = require(ReplicatedStorage.ActionButton.UI.Runtime)
-local AdminPermUtils = require(ReplicatedStorage.App.AdminPermUtils)
-require(ReplicatedStorage.App.UI.TopbarHolder)
-local SidebarHolder = require(ReplicatedStorage.App.UI.SidebarHolder)
-local BigButtonService = require(ReplicatedStorage.App.BigButtonService)
-local ItemUtils = require(ReplicatedStorage.App.ItemUtils)
-local BigMinimap = require(ReplicatedStorage.App.UI.BigMinimap)
-local MinimapRodux = require(ReplicatedStorage.App.UI.MinimapRodux)
-local MinimapConsts = require(ReplicatedStorage.App.MinimapConsts)
-local MinimapService = require(ReplicatedStorage.App.MinimapService)
-require(ReplicatedStorage.App.RunConsts)
-local Bounty = require(ReplicatedStorage.App.UI.Bounty)
-local CenterMessage = require(ReplicatedStorage.App.UI.CenterMessage)
-local TrackService = require(ReplicatedStorage.RaceTrack.TrackService)
-local SidebarUI = require(ReplicatedStorage.Game.SidebarUI)
-local Speedometer = require(ReplicatedStorage.Speedometer.UI.Speedometer)
-local SpeedometerUtils = require(ReplicatedStorage.Speedometer.SpeedometerUtils)
-local LicensePlate = require(ReplicatedStorage.Speedometer.UI.LicensePlate)
-local HotbarSystem = require(ReplicatedStorage.Hotbar.HotbarSystem)
-local Viewer = require(ReplicatedStorage.CCTV.UI.Viewer)
-local CCTVService = require(ReplicatedStorage.CCTV.CCTVService)
-local CmdrExtSystem = require(ReplicatedStorage.CmdrExt.CmdrExtSystem)
-local GameSettingsService = require(ReplicatedStorage.GameSettings.GameSettingsService)
-local gameSettingType = require(ReplicatedStorage.GameSettings.gameSettingType)
-local TabContainer = require(ReplicatedStorage.EzUi.TabContainer)
-local store = require(ReplicatedStorage.App.store)
-local Garage = require(ReplicatedStorage.Garage.UI.Garage)
-local GarageUtils = require(ReplicatedStorage.Garage.GarageUtils)
-local GarageConsts = require(ReplicatedStorage.Garage.GarageConsts)
-local CasinoKeypad = require(ReplicatedStorage.Casino.UI.CasinoKeypad)
-local ChatUtils = require(ReplicatedStorage.Chat.ChatUtils)
-local DamageIndicators = require(ReplicatedStorage.DamageIndicator.UI.DamageIndicators)
-local LikePromptRodux = require(ReplicatedStorage.LikePrompt.UI.LikePromptRodux)
-local Confirmation = require(ReplicatedStorage.Module.Confirmation)
-local Trade = require(ReplicatedStorage.Trade.UI.Trade)
-local TradeInitiations = require(ReplicatedStorage.Trade.UI.TradeInitiations)
-local TradeResult = require(ReplicatedStorage.Trade.UI.TradeResult)
-local RewardSpinner = require(ReplicatedStorage.RewardSpinner.UI.RewardSpinner)
-local Safes = require(ReplicatedStorage.Safes.UI.Safes)
-local SaleConsts = require(ReplicatedStorage.Sale.SaleConsts)
-local SpawnSelection = require(ReplicatedStorage.SpawnSelection.UI.SpawnSelection)
-local SpawnSelectionService = require(ReplicatedStorage.SpawnSelection.SpawnSelectionService)
-local ChooseSpawn = require(ReplicatedStorage.SpawnSelection.UI.ChooseSpawn)
-local SpawnSelectionConsts = require(ReplicatedStorage.SpawnSelection.SpawnSelectionConsts)
-local String = require(ReplicatedStorage.Std.String)
-local PlayerUtils = require(ReplicatedStorage.Game.PlayerUtils)
-local GarageConsts_2 = require(ReplicatedStorage.Game.Garage.GarageConsts)
-require(ReplicatedStorage.Inventory.InventoryItemSystem)
-local InputUtils = require(ReplicatedStorage.Std.InputUtils)
-local TooltipRodux = require(ReplicatedStorage.Tooltip.UI.TooltipRodux)
-local OtherTradeServerListRodux = require(ReplicatedStorage.Trade.UI.OtherTradeServerListRodux)
-local currentWorld = RunUtils.getWorld()
+local currentWorld  = RunUtils.getWorld()
+-- ── App component ────────────────────────────────────────────────────
 local AppComponent = Roact.Component:extend("App")
 local defaultProps = {}
 defaultProps.mapImageId = assert(MinimapConsts.MAP_IMAGE_ID[currentWorld], "missing mapImageId")
@@ -80,6 +160,7 @@ defaultProps.mapWorldCenterY = assert(MinimapConsts.MAP_WORLD_CENTER_Y[currentWo
 defaultProps.mapImageWidth = 512
 defaultProps.mapImageHeight = 512
 AppComponent.defaultProps = defaultProps
+-- ── AppComponent.init ────────────────────────────────────────────────
 function AppComponent.init(self)
 	self._maid = Maid.new()
 	self:setState({
@@ -327,7 +408,7 @@ function AppComponent.init(self)
 		local canCustomize = GarageUtils.inVehicle() and (GarageUtils.hasPremium() or GarageUtils.inPhysicalGarage())
 		if open then
 			if canCustomize then
-				local loadLastSelectionRemote = ReplicatedStorage:FindFirstChild(GarageConsts.LOAD_LAST_SELECTION_REMOTE_NAME)
+				local loadLastSelectionRemote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.LOAD_LAST_SELECTION_REMOTE_NAME)
 				if loadLastSelectionRemote then
 					loadLastSelectionRemote:FireServer()
 				end
@@ -346,7 +427,7 @@ function AppComponent.init(self)
 			garageVisible = open
 		})
 	end
-	local informUIOpenRemote = ReplicatedStorage:FindFirstChild(GarageConsts.INFORM_UI_IS_OPEN_REMOTE_NAME)
+	local informUIOpenRemote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.INFORM_UI_IS_OPEN_REMOTE_NAME)
 	informUIOpenRemote.OnClientEvent:Connect(setGarageUIOpen)
 	self._maid:GiveTask(SidebarUI.onGarageToggle:Connect(function()
 		if self.state.garageVisible then
@@ -376,7 +457,7 @@ function AppComponent.init(self)
 		})
 	end
 	function self.onClickSpawnVehicle(params)
-		local spawnVehicleRemote = ReplicatedStorage:FindFirstChild(GarageConsts.SPAWN_VEHICLE_REMOTE_NAME)
+		local spawnVehicleRemote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.SPAWN_VEHICLE_REMOTE_NAME)
 		if spawnVehicleRemote then
 			spawnVehicleRemote:FireServer(params.vehicleType, params.vehicleMake)
 		end
@@ -410,7 +491,7 @@ function AppComponent.init(self)
 				})
 			end)
 			confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
-				ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_VEHICLE_REMOTE_NAME):FireServer(vehicleMake)
+				Services.ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_VEHICLE_REMOTE_NAME):FireServer(vehicleMake)
 			end))
 		end
 	end
@@ -437,19 +518,19 @@ function AppComponent.init(self)
 		end))
 	end
 	function self.attemptEquipGarageItem(itemType, itemName)
-		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.EQUIP_ITEM_REMOTE_NAME)
+		local remote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.EQUIP_ITEM_REMOTE_NAME)
 		if remote then
 			remote:FireServer(itemType, itemName)
 		end
 	end
 	function self.attemptFavoriteGarageItem(itemType, itemName, favorited)
-		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME)
+		local remote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.UPDATE_FAVORITED_REMOTE_NAME)
 		if remote then
 			remote:FireServer(itemType, itemName, favorited)
 		end
 	end
 	function self.attemptBuyGarageItem(itemType, itemName)
-		local remote = ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_ITEM_REMOTE_NAME)
+		local remote = Services.ReplicatedStorage:FindFirstChild(GarageConsts.PURCHASE_ITEM_REMOTE_NAME)
 		if remote then
 			remote:FireServer(itemType, itemName)
 		end
@@ -560,6 +641,7 @@ function AppComponent.init(self)
 	})
 	showTooltipsSetting.onChanged:Connect(handleTooltips)
 end
+-- ── AppComponent.render ──────────────────────────────────────────────
 function AppComponent.render(self)
 	local children = {
 		Controls = createElement(Runtime, {
@@ -785,7 +867,7 @@ function AppComponent.render(self)
 				backgroundColor = Color3.fromRGB(17, 17, 17),
 				backgroundTransparency = 0.4,
 				[Roact.Ref] = self.settingsRef,
-				[Roact.Children] = createElement(require(ReplicatedStorage.GameSettings.UI.GameSettings), {
+				[Roact.Children] = createElement(require(Services.ReplicatedStorage.GameSettings.UI.GameSettings), {
 					size = UDim2.new(1, 0, 1, 0),
 					color = self.state.teamColor
 				})
@@ -877,6 +959,7 @@ function AppComponent.render(self)
 		store = store
 	}, { Roact.createFragment(children) })
 end
+-- ── AppComponent lifecycle ───────────────────────────────────────────
 function AppComponent.didMount(self)
 	self._maid:GivePromise(CmdrExtSystem.promiseCmdr():andThen(function(cmdr, cmdrFrame)
 		self.cmdr = cmdr
@@ -902,7 +985,7 @@ function AppComponent.didMount(self)
 				})
 			end
 		end))
-		self._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(ReplicatedStorage, "OpenCmdrMenu", function(remote)
+		self._maid:GiveTask(RxInstanceUtils.observeOneChildNamed(Services.ReplicatedStorage, "OpenCmdrMenu", function(remote)
 			remote.OnClientEvent:Connect(function()
 				self:setState({
 					devPanelVisible = true,
@@ -946,6 +1029,7 @@ end
 function AppComponent.willUnmount(self)
 	self._maid:DoCleaning()
 end
+-- ── Mount ────────────────────────────────────────────────────────────
 Roact.mount(createElement("ScreenGui", {
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 	ResetOnSpawn = false,

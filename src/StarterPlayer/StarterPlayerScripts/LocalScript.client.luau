@@ -736,17 +736,19 @@ Paraglide.Init({
 	em = em
 })
 local LerpTable, PlaySound, StopSound
+local function _comma(p1)
+	local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
+	return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
+end
+
+local function _FormatMoney(p1)
+	local t = {}
+	local v4, v5, v6 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
+	t[1] = v4 .. v5:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v6
+	return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t)
+end
+
 do
-	local function _comma(p1)
-		local v1, v2, v3 = string.match(p1, "^([^%d]*%d)(%d*)(.-)$")
-		return v1 .. v2:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v3
-	end
-	local function _FormatMoney(p1)
-		local t = {}
-		local v4, v5, v6 = string.match(abs(p1), "^([^%d]*%d)(%d*)(.-)$")
-		t[1] = v4 .. v5:reverse():gsub("(%d%d%d)", "%1,"):reverse() .. v6
-		return if p1 >= 0 then "" else "-" .. Localization:FormatByKey("General.Cash", t)
-	end
 	LerpTable = function(p1, p2, p3)
 		local t = {}
 		for v2, v3 in next, p2 do
@@ -1394,6 +1396,18 @@ do
 	end
 end
 local v34, toggleCrawling, OnJump
+
+
+local function _setSprinting(p1)
+	v19 = p1
+end
+local function _setSprinting_2(p1)
+	v19 = p1
+	if (p1 and true or false) ~= (DefaultActions.sprintButton._pressed and true or false) and DefaultActions.sprintButton._pressState then
+		DefaultActions.sprintButton._pressState()
+	end
+end
+
 do
 	local Animation = Instance.new("Animation")
 	if RunUtils.getEnv() == RunConsts.QA_NAME then
@@ -1470,15 +1484,6 @@ do
 		else
 			v34 = Humanoid:LoadAnimation(Animation)
 			v34:Play()
-		end
-	end
-	local function _setSprinting(p1)
-		v19 = p1
-	end
-	local function _setSprinting_2(p1)
-		v19 = p1
-		if (p1 and true or false) ~= (DefaultActions.sprintButton._pressed and true or false) and DefaultActions.sprintButton._pressState then
-			DefaultActions.sprintButton._pressState()
 		end
 	end
 	local function attemptToggleCrawling()
@@ -1981,8 +1986,8 @@ do
 			end
 		end
 	end
-	handleSetting_2((t15 f any):getValue())
-	(t15 :: any).onChanged:Connect(handleSetting_2)
+	handleSetting_2(t15:getValue())
+	t15.onChanged:Connect(handleSetting_2)
 	GameSettingsService.add({
 		name = "autoLockVehicle",
 		title = "Lock/Unlock Vehicle On Enter/Exit",
@@ -2046,7 +2051,7 @@ do
 							_setSprinting_2(true)
 						end
 					end)
-					local v10, v11, v12 = VehicleUtils.prepareCameraSubject(p1, (t15 :: any):getValue(), true)
+					local v10, v11, v12 = VehicleUtils.prepareCameraSubject(p1, t15:getValue(), true)
 					if v10 then
 						v8:GiveTask(TransitionCamera(v10, 0.5, v11, Vector3.new(0, 0, 0), v12))
 						CurrentCamera.CameraSubject = v10
@@ -2237,17 +2242,17 @@ do
 							}
 							v8:GiveTask(ActionButtonService.add(t3))
 							if os.clock() - v51 < v50 then
-								(t3 :: any)._lastUsed = v51
-								(t3 :: any)._maid.progress = RunService.Heartbeat:Connect(function()
+								t3._lastUsed = v51
+								t3._maid.progress = RunService.Heartbeat:Connect(function()
 									local v1 = (os.clock() - t3._lastUsed) / t3.useEvery
 									if v1 >= 1 then
-										(t3 :: any)._maid.progress = nil
-										(t3 :: any).updateProgressBinding(0)
+										t3._maid.progress = nil
+										t3.updateProgressBinding(0)
 									else
-										(t3 :: any).updateProgressBinding(v1)
+										t3.updateProgressBinding(v1)
 									end
 								end)
-								v8:GiveTask((t3 :: any)._maid.progress)
+								v8:GiveTask(t3._maid.progress)
 							end
 						end
 						if p1.Type == "Chassis" or p1.Type == "Heli" then
@@ -2598,15 +2603,16 @@ function em.showFaultyActionMessage()
 	v9.FaultyAction.Visible = false
 end
 local t17
-do
-	local function _Ease_inOutQuad(p1, p2, p3, p4)
-		local v1 = p1 / p4 * 2
-		if v1 < 1 then
-			return p3 * 0.5 * v1 * v1 + p2
-		else
-			return -p3 * 0.5 * ((v1 - 1) * (v1 - 3) - 1) + p2
-		end
+local function _Ease_inOutQuad(p1, p2, p3, p4)
+	local v1 = p1 / p4 * 2
+	if v1 < 1 then
+		return p3 * 0.5 * v1 * v1 + p2
+	else
+		return -p3 * 0.5 * ((v1 - 1) * (v1 - 3) - 1) + p2
 	end
+end
+
+do
 	t17 = {}
 	local insert = table.insert
 	local remove = table.remove
@@ -3279,8 +3285,8 @@ do
 	local function handleSetting_3(p1)
 		SoundService.RobberyMusic.Volume = math.clamp(p1 / 100, 0, 1)
 	end
-	handleSetting_3((t25 :: any):getValue())
-	(t25 :: any).onChanged:Connect(handleSetting_3)
+	handleSetting_3(t25:getValue())
+	t25.onChanged:Connect(handleSetting_3)
 	local t26 = {
 		name = "otherRadios",
 		title = "Other Radios",
@@ -3298,8 +3304,8 @@ do
 	local function handleSetting_4(p1)
 		SoundService.OtherRadios.Volume = math.clamp(p1 / 100, 0, 1)
 	end
-	handleSetting_4((t26 :: any):getValue())
-	(t26 :: any).onChanged:Connect(handleSetting_4)
+	handleSetting_4(t26:getValue())
+	t26.onChanged:Connect(handleSetting_4)
 	local t27 = {
 		name = "lightShadows",
 		title = "Light Shadows",
@@ -3315,7 +3321,7 @@ do
 			v2.Shadows = p1
 		end
 	end
-	(t27 :: any).onChanged:Connect(handleSetting_5)
+	t27.onChanged:Connect(handleSetting_5)
 	CollectionService:GetInstanceAddedSignal("ShadowLight"):Connect(function(p1)
 		p1.Shadows = v69
 	end)
@@ -3333,8 +3339,8 @@ do
 	local function handleSetting_6(p1)
 		game:GetService("Lighting").GlobalShadows = p1
 	end
-	handleSetting_6((t28 :: any):getValue())
-	(t28 :: any).onChanged:Connect(handleSetting_6);
+	handleSetting_6(t28:getValue())
+	t28.onChanged:Connect(handleSetting_6);
 	(function()
 		return (""):sub(-1, 1)
 	end)()
@@ -4558,7 +4564,7 @@ do
 						v1 = true
 						v2 = "VisDetect"
 					end
-					if (debug :: any).getupvalues then
+					if debug.getupvalues then
 						v1 = true
 						v2 = "Getupvalues"
 					end
