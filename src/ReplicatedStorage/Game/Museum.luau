@@ -85,7 +85,7 @@ return function(museumEventConfig)
 	local securityState = {}
 	local maidCleaner = Maid.new()
 	local heartbeatConnection = nil
-	function em.aad1ukee(securityNodes)
+	function em.museumSpotlightTriggered(securityNodes)
 		if not heartbeatConnection then
 			return false
 		end
@@ -97,9 +97,9 @@ return function(museumEventConfig)
 			node.Part.Color = Color3.fromRGB(153, 153, 153)
 		end
 	end
-	function em.impi1r3j(securityNodes)
+	function em.museumSpotlightInit(securityNodes)
 		if heartbeatConnection then
-			em.aad1ukee()
+			em.museumSpotlightTriggered()
 		end
 		for nodeIndex, node in next, securityNodes do
 			node.Part.Transparency = 0
@@ -112,7 +112,7 @@ return function(museumEventConfig)
 					if not (currentTime - initialTime < 0.2) and currentTime - node.LastDamage >= 0.5 then
 						initialTime = currentTime
 						node.LastDamage = currentTime
-						event:FireServer("ypu5apwp")
+						event:FireServer("museamSpotlightTrigger")
 					end
 				end
 			end))
@@ -151,7 +151,7 @@ return function(museumEventConfig)
 	local function Action(instance, isCompleted)
 		if isCompleted then
 			PlaySound(LocalPlayer, 1843025542)
-			event:FireServer("r20fuycw", instance.Part)
+			event:FireServer("museumPlaceDynamite", instance.Part)
 			return true
 		end
 	end
@@ -194,7 +194,7 @@ return function(museumEventConfig)
 		if isCompleted then
 			PlaySound(LocalPlayer, 1988477690)
 			PlaySound(LocalPlayer, 8473658289)
-			event:FireServer("rwm1ahpj", instance.Part)
+			event:FireServer("grabMuseumItem", instance.Part)
 			return true
 		end
 	end
@@ -248,7 +248,7 @@ return function(museumEventConfig)
 	local function Action_3(instance, isCompleted)
 		if isCompleted then
 			PlaySound(LocalPlayer, 1837831244)
-			event:FireServer("zibamr1v", instance.Part)
+			event:FireServer("museumPullLever", instance.Part)
 			return true
 		end
 	end

@@ -33,7 +33,7 @@ local ItemSystem = {
 function ItemSystem.Init(configData)
 	itemDropEvent = configData.Event
 	local eventManager = configData.em
-	function eventManager.ogsbqczn(player, inputType, keyCode)
+	function eventManager.itemInputBegan(player, inputType, keyCode)
 		local equippedItem = ItemSystem.GetEquipped(player)
 		if equippedItem ~= nil then
 			equippedItem:InputBegan({
@@ -42,7 +42,7 @@ function ItemSystem.Init(configData)
 			}, false)
 		end
 	end
-	function eventManager.p2ylc2nx(player, inputType, keyCode)
+	function eventManager.itemInputEnded(player, inputType, keyCode)
 		local equippedItem = ItemSystem.GetEquipped(player)
 		if equippedItem ~= nil then
 			equippedItem:InputEnded({
@@ -303,7 +303,7 @@ function ItemSystem.Init(configData)
 	InventoryItemBinder:GetClassAddedSignal():Connect(function(inventoryItem)
 		inventoryItem._maid:GiveTask(inventoryItem.onAttemptDrop:Connect(function()
 			if inventoryItem:GetOwner() == Players.LocalPlayer then
-				itemDropEvent:FireServer("xutr1qyd")
+				itemDropEvent:FireServer("dropItem")
 			end
 		end))
 	end)
@@ -360,11 +360,11 @@ function ItemSystem._equip(player, inventoryItemValue)
 		end
 		function equippedItem.BroadcastInputBegan(self, inputEvent)
 			assert(inputEvent ~= nil)
-			itemDropEvent:FireServer("ogsbqczn", inputEvent.UserInputType, inputEvent.KeyCode)
+			itemDropEvent:FireServer("itemInputBegan", inputEvent.UserInputType, inputEvent.KeyCode)
 		end
 		function equippedItem.BroadcastInputEnded(self, inputEvent)
 			assert(inputEvent ~= nil)
-			itemDropEvent:FireServer("p2ylc2nx", inputEvent.UserInputType, inputEvent.KeyCode)
+			itemDropEvent:FireServer("itemInputEnded", inputEvent.UserInputType, inputEvent.KeyCode)
 		end
 	end
 	equippedItemsByPlayer[player] = equippedItem

@@ -31,7 +31,7 @@ function Glider.GetLeftArmPosition(self)
 	return nil
 end
 function Glider.ShootBegin(self, input)
-	eventSignal:FireServer("k1lnwg5x")
+	eventSignal:FireServer("useGlider")
 end
 function Glider.InputBegan(self, inputEvent, gameProcessed)
 	if if inputEvent.UserInputType == Enum.UserInputType.MouseButton1 then true elseif inputEvent.UserInputType == Enum.UserInputType.Gamepad1 then inputEvent.KeyCode == Enum.KeyCode.ButtonR2 else false then

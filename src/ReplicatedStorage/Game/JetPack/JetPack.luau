@@ -184,7 +184,7 @@ function JetPack.Equip(player, fuelData)
 					SteppedConn = RunService.Heartbeat:Connect(Heartbeat)
 				end
 				if player == LocalPlayer then
-					Event:FireServer("effrclru")
+					Event:FireServer("equipJetpackServer")
 				end
 				return packet
 			else
@@ -290,7 +290,7 @@ function JetPack.Unequip(player)
 			JetPack.UnequipLocal(foundPacket)
 		end
 		if player == LocalPlayer then
-			Event:FireServer("ab3zo4do")
+			Event:FireServer("equipJetpackLocal")
 		end
 	end
 	return nil
@@ -465,7 +465,7 @@ function JetPack.StartThrust(player)
 		packet.SoundThrustVolumeTarget = 0.3
 		JetPack.SetThrustVisual(packet, 1)
 		if player == LocalPlayer then
-			Event:FireServer("d0r024ne")
+			Event:FireServer("startJetpackThrust")
 		end
 	end
 end
@@ -485,7 +485,7 @@ function JetPack.StopThrust(player)
 		packet.SoundThrustVolumeTarget = 0.05
 		JetPack.SetThrustVisual(packet, 0.3)
 		if player == LocalPlayer then
-			Event:FireServer("m1jxlp0h")
+			Event:FireServer("endJetpackThrust")
 		end
 	end
 end

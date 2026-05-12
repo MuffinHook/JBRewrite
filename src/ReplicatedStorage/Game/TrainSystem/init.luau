@@ -141,7 +141,7 @@ return {
 				local currentTime = tick()
 				if currentTime - lastReplicationTime > 0.5 then
 					lastReplicationTime = currentTime
-					eventSignal:FireServer("ktpsgjel", replicationData.SystemId)
+					eventSignal:FireServer("getTrainData", replicationData.SystemId)
 				end
 				return false
 			end

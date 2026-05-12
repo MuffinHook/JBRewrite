@@ -84,7 +84,7 @@ return {
 				rootPart = if Humanoid == nil then nil else Humanoid.RootPart
 			end
 			if rootPart ~= nil and (explosionPosition - rootPart.Position).Magnitude < 64 then
-				event:FireServer("pk1w8s32", explosionPosition)
+				event:FireServer("cargoShipExplosion", explosionPosition)
 			end
 		end
 		cargoShipBinder:GetClassAddedSignal():Connect(function(cargoShip)

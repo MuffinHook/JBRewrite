@@ -47,7 +47,7 @@ function BatonClass.SwingLunge(self)
 		})
 		if self.Local then
 			CharacterUtil.WalkSpeedSpring:Accelerate(35)
-			batonEvent:FireServer("m6rmpdf6", 2)
+			batonEvent:FireServer("swingBatonOrSword", 2)
 		end
 	end)
 end
@@ -60,7 +60,7 @@ function BatonClass.SwingSwoosh(self)
 	self.SpringWaistRotation:Accelerate(Vector3.new(-math.pi, 15.707964, 0))
 	self.SpringNeckRotation:Accelerate(Vector3.new(1.2566371, -math.pi, 0))
 	if self.Local then
-		batonEvent:FireServer("m6rmpdf6", 1)
+		batonEvent:FireServer("swingBatonOrSword", 1)
 	end
 end
 return BatonClass

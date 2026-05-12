@@ -110,7 +110,7 @@ function C4.ShootBegin(self, inputState)
 			task.spawn(function()
 				c4Instance:ListenForAttach()
 			end)
-			eventObject:FireServer("xn8wslok")
+			eventObject:FireServer("throwC4")
 			self.Model.Model.Screen.Color = Color3.new(255/255, 0/255, 0/255)
 		end
 		if self.Local then
@@ -169,7 +169,7 @@ function C4.ShootBegin(self, inputState)
 					task.spawn(function()
 						c4Instance:ListenForAttach()
 					end)
-					eventObject:FireServer("xn8wslok")
+					eventObject:FireServer("throwC4")
 					self.Model.Model.Screen.Color = Color3.new(255/255, 0/255, 0/255)
 				end
 				if self.Local then

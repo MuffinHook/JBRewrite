@@ -101,7 +101,7 @@ local function MakeCar(car, train)
 				if characterParent == LocalPlayer.Character then
 					local Humanoid = characterParent:FindFirstChild("Humanoid")
 					if Humanoid and Humanoid.Health > 1 then
-						train:FireServer("xe6v1us6", 100, "Train")
+						train:FireServer("enviornmentDamage", 100, "Train")
 						lastTouchTime = currentTime
 					end
 				end

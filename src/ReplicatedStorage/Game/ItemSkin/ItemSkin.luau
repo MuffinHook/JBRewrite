@@ -9,7 +9,7 @@ local t = { ItemSkinsOwned = nil }
 function t.Init(em)
 	local serverEvent = em.Event
 	uiModule = require(ReplicatedStorage.Game.ItemSkin.UI.UI)
-	function em.efbs1qej(skinData)
+	function em.updateItemSkinsOwned(skinData)
 		assert(skinData)
 		t.ItemSkinsOwned = skinData
 		uiModule.UpdateOwned()

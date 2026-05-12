@@ -50,7 +50,7 @@ return {
 		self._maid:GiveTask(damageRegion)
 		self._maid:GiveTask(damageRegion.OnObjAdded:Connect(function()
 			if not DoorUtils.getOpen(fakeDoor) then
-				remoteEvent:FireServer("xe6v1us6", damageAmount, "Spikes")
+				remoteEvent:FireServer("enviornmentDamage", damageAmount, "Spikes")
 				DoorUtils.setOpen(fakeDoor, true)
 				Promise.delay(doorCloseDelay):andThen(function()
 					DoorUtils.setOpen(fakeDoor, false)

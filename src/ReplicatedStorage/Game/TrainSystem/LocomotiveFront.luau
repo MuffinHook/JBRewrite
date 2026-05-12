@@ -68,7 +68,7 @@ local function MakeCar(locomotiveData, hitRemote)
 				if hitObject == LocalPlayer.Character then
 					local Humanoid = hitObject:FindFirstChild("Humanoid")
 					if Humanoid and Humanoid.Health > 1 then
-						hitRemote:FireServer("xe6v1us6", 100, "Train")
+						hitRemote:FireServer("enviornmentDamage", 100, "Train")
 						lastTouchTime = currentTouchTime
 					end
 				end

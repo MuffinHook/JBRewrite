@@ -23,7 +23,7 @@ TaserClass.__index = TaserClass
 setmetatable(TaserClass, Basic)
 function TaserClass.Init(self)
 	eventDispatcher = self.Event
-	function self.em.enmm5zqj(self, eventData)
+	function self.em.drawTaserLine(self, eventData)
 		local equippedItem = ItemSystem.GetEquipped(self)
 		if equippedItem ~= nil and equippedItem.Draw then
 			equippedItem:Draw(eventData)
@@ -106,7 +106,7 @@ function TaserClass.Draw(self, targetPosition)
 		})
 		game:GetService("Debris"):AddItem(lightningEffect, 0.1)
 		if self.Local then
-			eventDispatcher:FireServer("enmm5zqj", targetPosition)
+			eventDispatcher:FireServer("drawTaserLine", targetPosition)
 		end
 	end
 end
@@ -163,7 +163,7 @@ function TaserClass.Tase(self, keycode)
 					if hitInstance then
 						local hitPlayer = PlayerUtils.getPlayerFromDescendant(hitInstance)
 						if hitPlayer then
-							eventDispatcher:FireServer("qzetmoke", hitPlayer.Character:FindFirstChild("Humanoid"), hitInstance, targetPosition)
+							eventDispatcher:FireServer("tazePlayer", hitPlayer.Character:FindFirstChild("Humanoid"), hitInstance, targetPosition)
 							nextUseTime = currentTime + self.Config.ReloadTimeHit
 							self.CrossHair:Flare()
 							reloadTime = self.Config.ReloadTimeHit

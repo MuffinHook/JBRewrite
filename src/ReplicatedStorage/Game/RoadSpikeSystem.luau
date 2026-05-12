@@ -29,7 +29,7 @@ local function Check()
 				if math.sign(prevDotProduct) ~= math.sign(currentDotProduct) then
 					local crossAxisDot = (Position - partPosition):Dot(partCFrame.RightVector)
 					if math.abs(crossAxisDot) <= Part.Size.X * 0.5 and math.abs(((Position - partPosition):Dot(partCFrame.UpVector))) < 16 then
-						spikeEvent:FireServer("a0cym8fr", Part)
+						spikeEvent:FireServer("vehicleTouchRoadspike", Part)
 					end
 				end
 			end

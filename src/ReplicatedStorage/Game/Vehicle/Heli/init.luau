@@ -633,7 +633,7 @@ return function(initPacket)
 	HeliModule.Roped = false
 	function HeliModule.AttemptRopeDetach()
 		assert(HeliModule.Roped)
-		serverEvent:FireServer("s5mzpnz8")
+		serverEvent:FireServer("detachFromRope")
 	end
 	function eventModule.shbm9fuh(isRoped)
 		HeliModule.Roped = isRoped
@@ -648,12 +648,12 @@ return function(initPacket)
 		end
 	end
 	local function AttemptDropRope()
-		serverEvent:FireServer("a4o5l53e")
+		serverEvent:FireServer("dropRope")
 	end
 	local CircleAction = UI.CircleAction
 	local function Action(actionData, held)
 		if held then
-			serverEvent:FireServer("q9k4lp9h", actionData.Part)
+			serverEvent:FireServer("grabRope", actionData.Part)
 			return true
 		end
 	end
@@ -747,11 +747,11 @@ return function(initPacket)
 		local _, worldTarget = RayCast.RayIgnoreNonCollideWithIgnoreList(screenRay.Origin, screenRay.Direction, 999, { vp.Model, LocalPlayer.Character })
 		local _, aimTarget = RayCast.RayIgnoreNonCollideWithIgnoreList(missileCFrame.p, ClampUnitVectorCone(vp.Model.Engine.CFrame, (worldTarget - missileCFrame.p).Unit, 1.0471975511965976), 999, { vp.Model, LocalPlayer.Character })
 		local fireTime = Time.GetNowSync()
-		serverEvent:FireServer("exva0l4q", missileCFrame, missileVelocity, aimTarget, fireTime)
+		serverEvent:FireServer("fireMissle", missileCFrame, missileVelocity, aimTarget, fireTime)
 		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime)
 		Missiles.i = Missiles.i % #Missiles.Parts + 1
 	end
-	function eventModule.exva0l4q(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
+	function eventModule.fireMissle(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
 		Missile.LaunchMissile(missileCFrame, missileVelocity, aimTarget, fireTime, extraParam1, extraParam2, extraParam3)
 	end
 	local function AttemptDropBomb()
@@ -776,9 +776,9 @@ return function(initPacket)
 		local dropVelocity = BoundingBox.Velocity
 		local dropTime = Time.GetNowSync()
 		Bomb.DropBomb(dropCFrame, dropVelocity, dropTime, LocalPlayer)
-		serverEvent:FireServer("ukkcmz0e", dropCFrame, dropVelocity, dropTime)
+		serverEvent:FireServer("dropBomb", dropCFrame, dropVelocity, dropTime)
 	end
-	function eventModule.ukkcmz0e(dropCFrame, dropVelocity, dropTime, player)
+	function eventModule.dropBomb(dropCFrame, dropVelocity, dropTime, player)
 		Bomb.DropBomb(dropCFrame, dropVelocity, dropTime, player)
 	end
 	function HeliModule.attemptDropRope()
@@ -797,7 +797,7 @@ return function(initPacket)
 				spotlight:RequestToggle()
 			end
 		else
-			serverEvent:FireServer("sgcbalmd", "Lights")
+			serverEvent:FireServer("toggleHeadlights", "Lights")
 		end
 	end
 	function HeliModule.setUp(active)

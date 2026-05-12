@@ -107,7 +107,7 @@ function Gun.Init(eventBus)
 			end
 		end)
 	end)
-	function eventBus.em.ssc92uk2(player, isLeaning, isLeaningRight)
+	function eventBus.em.gunLeanIn(player, isLeaning, isLeaningRight)
 		local equippedItem = ItemSystem.GetEquipped(player)
 		if equippedItem ~= nil and equippedItem.SetLeaning then
 			equippedItem:SetLeaning(isLeaning, isLeaningRight)
@@ -330,7 +330,7 @@ end
 
 function Gun.ApplySkin(self, skinName)
 	if self.Local then
-		gunEvent:FireServer("cvro44st", self.inventoryItemValue, skinName)
+		gunEvent:FireServer("equipGunSkin", self.inventoryItemValue, skinName)
 	end
 end
 
@@ -427,7 +427,7 @@ function Gun.SetupBulletEmitter(self)
 				until loopCount >= 5
 				local vehicleBoundingBox = if current == nil then false else current:FindFirstChild("BoundingBox")
 				if vehicleBoundingBox then
-					gunEvent:FireServer("uw4j5uqm", vehicleBoundingBox.Parent, self.__ClassName)
+					gunEvent:FireServer("damageVehicle", vehicleBoundingBox.Parent, self.__ClassName)
 				end
 			end
 			if hitPart.Name == "ShootingRangePart" then
@@ -442,7 +442,7 @@ function Gun.SetupBulletEmitter(self)
 				return
 			end
 			if workspace:FindFirstChild("Museum") and hitPart:IsDescendantOf(workspace.Museum) then
-				gunEvent:FireServer("s1bqgxg1", hitPart)
+				gunEvent:FireServer("shootPlanet", hitPart)
 				return
 			end
 			local current = hitPart
@@ -459,7 +459,7 @@ function Gun.SetupBulletEmitter(self)
 				end
 				local explodableBarrel = ExplodableBarrelBinder:Get(current)
 				if explodableBarrel then
-					gunEvent:FireServer("s1bqgxg1", explodableBarrel.obj, self.__ClassName)
+					gunEvent:FireServer("shootPlanet", explodableBarrel.obj, self.__ClassName)
 					return
 				end
 				current = current.Parent
@@ -1047,7 +1047,7 @@ function Gun.SetLeaning(self, isLeaning, isLeaningRight)
 		self.SpringNeckRotation:SetTarget(self.Config.Motion.Hip.Springs.NeckRotation)
 	end
 	if self.Local then
-		gunEvent:FireServer("ssc92uk2", isLeaning, isLeaningRight)
+		gunEvent:FireServer("gunLeanIn", isLeaning, isLeaningRight)
 	end
 end
 

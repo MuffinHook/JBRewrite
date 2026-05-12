@@ -50,7 +50,7 @@ function RoadSpike.SetupGui(self)
 			image = "rbxassetid://4939737424",
 			keyCodes = { Enum.KeyCode.R, Enum.KeyCode.ButtonX },
 			onPressed = function()
-				itemEvent:FireServer("tbj5ogfw")
+				itemEvent:FireServer("clearRoadSpike")
 			end
 		}))
 	end
@@ -106,7 +106,7 @@ function RoadSpike.PlaceBeam(self, targetPosition)
 	elseif self.EndPosition == nil then
 		self.EndPosition = targetPosition
 		if self.Local then
-			itemEvent:FireServer("ph1vq30b", self.StartPosition, self.EndPosition)
+			itemEvent:FireServer("placeRoadSpike", self.StartPosition, self.EndPosition)
 		end
 	end
 	if self.StartPosition ~= nil and self.EndPosition ~= nil then

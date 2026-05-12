@@ -72,17 +72,17 @@ function VehicleUtils.Init(vehicleConfig)
 	end
 	function VehicleUtils.toggleLocalLocked()
 		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
-		eventSignal:FireServer("runjvomi", vehiclePacket.Model:GetAttribute("Locked") ~= true)
+		eventSignal:FireServer("lockVehicle", vehiclePacket.Model:GetAttribute("Locked") ~= true)
 	end
 	function VehicleUtils.canLocalEject()
 		local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
 		return vehiclePacket and (not vehiclePacket.Passenger and (vehiclePacket.Model and not vehiclePacket.Model:GetAttribute("DisableEjecting"))) and true or false
 	end
 	function VehicleUtils.attemptPassengerEject(passenger)
-		eventSignal:FireServer("twej3gut", passenger)
+		eventSignal:FireServer("ejectPassenger", passenger)
 	end
 	function VehicleUtils.attemptBuyMissiles()
-		eventSignal:FireServer("bri932nx")
+		eventSignal:FireServer("attemptBuyMissiles")
 	end
 	local isMissileConfirmationOpen = false
 	function VehicleUtils.promptMissileBuy()

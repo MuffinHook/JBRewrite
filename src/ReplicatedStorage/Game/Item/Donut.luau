@@ -48,7 +48,7 @@ function DonutClass.InputBegan(self, userInputData, p3)
 				if currentTime - lastConsumedTime < 5 then
 					return false
 				end
-				event:FireServer("ojccdr13")
+				event:FireServer("grabDonut")
 			end
 		end)
 		if self.Local then

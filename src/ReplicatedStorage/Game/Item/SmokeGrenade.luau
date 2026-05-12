@@ -86,7 +86,7 @@ function SmokeGrenade.ShootBegin(self, input)
 		grenadeInstance._maid:GiveTask(function()  end)
 		self:SetNextShotPossible()
 		self:DecrementAmmo()
-		eventSignal:FireServer("i4zp6p5r")
+		eventSignal:FireServer("explodeSmokeGrenade")
 		self:ReloadDropAmmoVisual()
 		task.delay(0.1, function()
 			if self.Destroyed then

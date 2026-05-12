@@ -66,12 +66,12 @@ local function Action(drawerRoot, isPressed)
 		if isCharacterPresent then
 			local drawerItem = BinderUtils.findFirstChild(InventoryItemBinder, ValidRoot)
 			if equippedItem then
-				EventRemote:FireServer("eoxa4pio", ValidRoot, equippedItem.obj)
+				EventRemote:FireServer("stashPlaceItem", ValidRoot, equippedItem.obj)
 			elseif drawerItem then
-				EventRemote:FireServer("lx8ebkqc", ValidRoot)
+				EventRemote:FireServer("stashGrabItem", ValidRoot)
 			end
 		else
-			EventRemote:FireServer("b01s63wc", ValidRoot)
+			EventRemote:FireServer("stashInspectDrawer", ValidRoot)
 		end
 		return true
 	end
@@ -107,12 +107,12 @@ return {
 		EventRemote = initConfig.Event
 		EventManager = em
 		local ScreenGui = initConfig.ScreenGui
-		function em.aa02dq4j(character)
+		function em.updateCurrentCharacter(character)
 			assert(character)
 			currentCharacter = character
 		end
 		local cellTimerCounter = 0
-		function em.fwrmzn28()
+		function em.startCellCountdown()
 			local timerId = cellTimerCounter + 1
 			cellTimerCounter = timerId
 			local Cell = Settings.Time.Cell

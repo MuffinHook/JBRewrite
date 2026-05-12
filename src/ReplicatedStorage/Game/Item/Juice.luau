@@ -35,7 +35,7 @@ Juice.__index = Juice
 setmetatable(Juice, Basic)
 function Juice.Init(juiceItem)
 	eventObject = juiceItem.Event
-	function juiceItem.em.l2x2ypvi()
+	function juiceItem.em.useJuice()
 		CharacterUtil.IsJuiced = true
 		CharacterUtil.WalkSpeedSpring:Accelerate(20)
 		local shockwaveFx = ShockwaveScreenFx.new()
@@ -79,7 +79,7 @@ function Juice.InputBegan(juiceItem, inputObject, p3)
 				if now - lastConsumedTime < 5 then
 					return false
 				end
-				eventObject:FireServer("l2x2ypvi")
+				eventObject:FireServer("useJuice")
 			end
 		end)
 		if juiceItem.Local then

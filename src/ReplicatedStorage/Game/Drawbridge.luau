@@ -64,7 +64,7 @@ local DrawbridgeModule = {
 }
 function DrawbridgeModule.Init(module)
 	task.spawn(DrawbridgeModule._initSpawned, DrawbridgeModule)
-	function module.em.fbs2dwjk(open)
+	function module.em.toggleDrawbridge(open)
 		if open then
 			DrawbridgeModule.Open()
 		else

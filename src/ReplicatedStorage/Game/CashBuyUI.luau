@@ -137,14 +137,14 @@ function t.SetupCashDrop()
 		})
 		local dropAmount = tonumber(Amount.Text)
 		if dropAmount then
-			cashDropEvent:FireServer("h4ogv4dl", dropAmount)
+			cashDropEvent:FireServer("dropCash", dropAmount)
 		end
 	end)
 	local CircleAction = UI.CircleAction
 	local function Action(dropModel, isConfirmed)
 		local targetDrop = dropModel.Part.Parent
 		if isConfirmed then
-			cashDropEvent:FireServer("x2sggouq", targetDrop)
+			cashDropEvent:FireServer("grabCash", targetDrop)
 			return true
 		end
 	end

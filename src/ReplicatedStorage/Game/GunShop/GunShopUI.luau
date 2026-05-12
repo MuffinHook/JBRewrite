@@ -101,11 +101,11 @@ function GunShopUI.displayList(itemList)
 			gunShopItem:SetLevel(itemConfig.Level)
 			gunShopItem._maid:GiveTask(gunShopItem.onMouseButton1Down:Connect(function()
 				if gunShopItem:GetEquipped() then
-					eventSignal:FireServer("yhameqcz", itemName)
+					eventSignal:FireServer("gunshopUnequip", itemName)
 				elseif GunShopSystem.doesPlayerOwn(itemName) then
-					eventSignal:FireServer("t2ley62p", itemName)
+					eventSignal:FireServer("gunshopEquip", itemName)
 				else
-					eventSignal:FireServer("tlcucis3", itemName)
+					eventSignal:FireServer("gunshopPurchase", itemName)
 				end
 			end))
 			if itemConfig.RequireAnyGamepass then

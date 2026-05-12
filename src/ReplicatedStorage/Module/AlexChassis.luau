@@ -549,10 +549,10 @@ function Chassis.onGearShift(p1, p2, p3)
 end
 function Chassis.toggleSirens()
 	isSirensOn = not isSirensOn
-	vehicleEvent:FireServer("xjgmjeb2", "PoliceLights", isSirensOn)
+	vehicleEvent:FireServer("vehicleUpdate", "PoliceLights", isSirensOn)
 end
 function Chassis.toggleHeadlights()
-	vehicleEvent:FireServer("xjgmjeb2", "Lights")
+	vehicleEvent:FireServer("vehicleUpdate", "Lights")
 end
 function Chassis.setHandbrakeEnabled(p1)
 	isHandbrakeHeld = p1
@@ -572,7 +572,7 @@ function Chassis.runAction(p1)
 	if p1 then
 		local v1 = VehicleUtils.GetLocalVehiclePacket()
 		if v1.Make == "Firetruck" then
-			vehicleEvent:FireServer("xjgmjeb2", "FiretruckWater", true)
+			vehicleEvent:FireServer("vehicleUpdate", "FiretruckWater", true)
 		elseif v1.Make == "TheAgent" then
 			Chassis.AttemptFireMissile(v1)
 		elseif p1 == "Jump" then
@@ -582,15 +582,15 @@ function Chassis.runAction(p1)
 				local v7 = v1.jumpMaxAmount or 75
 				Engine:ApplyImpulse(Vector3.new(0, v7 - (v7 - (v1.jumpBaseAmount or 40)) * math.clamp(v4 / (v1.jumpMaxMph or 500), 0, 1), 0) * Engine.AssemblyMass)
 				VehicleUtils.vehicleEffect("Jump", v1.Model)
-				vehicleEvent:FireServer("xjgmjeb2", "Jump")
+				vehicleEvent:FireServer("vehicleUpdate", "Jump")
 				v1._lastJumpAt = os.clock()
 				return true
 			end
 		else
-			vehicleEvent:FireServer("xjgmjeb2", "Action")
+			vehicleEvent:FireServer("vehicleUpdate", "Action")
 		end
 	elseif ChassisShared.VehicleMake == "Firetruck" then
-		vehicleEvent:FireServer("xjgmjeb2", "FiretruckWater", false)
+		vehicleEvent:FireServer("vehicleUpdate", "FiretruckWater", false)
 	end
 	return false
 end
@@ -1835,7 +1835,7 @@ function Chassis.UpdateEngine(p1, p2, p3)
 		if p1.UpsideDownTime then
 			if tick() - p1.UpsideDownTime > 2 then
 				p1.UpsideDownTime = nil
-				vehicleEvent:FireServer("hrm1cr55")
+				vehicleEvent:FireServer("flipVehicle")
 			end
 		else
 			p1.UpsideDownTime = tick()
@@ -2045,7 +2045,7 @@ function Chassis.AttemptFireMissile(p1)
 	local t = { p1.Model, LocalPlayer.Character }
 	local _, v5 = RayCast.RayIgnoreNonCollideWithIgnoreList(v4.p, (p1.Model.Engine.CFrame.LookVector * 60 - Vector3.new(0, 2, 0)).Unit, 999, t)
 	local v6 = Time.GetNowSync()
-	vehicleEvent:FireServer("aen5zwf0", v4, Velocity, v5, v6, "RocketPart2", 0)
+	vehicleEvent:FireServer("vehicleFireMissle", v4, Velocity, v5, v6, "RocketPart2", 0)
 	Missile.LaunchMissile(v4, Velocity, v5, v6, "RocketPart2", 0, t)
 	Missiles.i = Missiles.i % #Missiles.Parts + 1
 	return true
@@ -2130,7 +2130,7 @@ end
 local CircleAction = UI.CircleAction
 local function Action(p1, p2)
 	if p2 then
-		vehicleEvent:FireServer("t9hpd4o4", p1.Part)
+		vehicleEvent:FireServer("moveFiretruckLadder", p1.Part)
 	end
 	return true
 end

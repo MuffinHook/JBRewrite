@@ -150,7 +150,7 @@ local function SetupBoxCar(trainCar)
 				actionSuccess = true
 			end
 			if actionSuccess then
-				serverEvent:FireServer("birq5v2d", trainCar.SystemId, trainCar.Id)
+				serverEvent:FireServer("openCargoTrainTopDoor", trainCar.SystemId, trainCar.Id)
 			else
 				return false
 			end
@@ -205,7 +205,7 @@ local function SetupBoxCar(trainCar)
 				actionSuccess = true
 			end
 			if actionSuccess then
-				serverEvent:FireServer("wvsrc40j", trainCar.SystemId, trainCar.Id)
+				serverEvent:FireServer("openCargoTrainSideDoor", trainCar.SystemId, trainCar.Id)
 			else
 				return false
 			end
@@ -228,7 +228,7 @@ local function SetupBoxCar(trainCar)
 	table.insert(circleActionSpecs, sideDoorSpec)
 	local function Action_3(isActive, isCompleted)
 		if isCompleted and OpenVaultDoorRaw(trainCar) then
-			serverEvent:FireServer("udhdjqcd", trainCar.SystemId, trainCar.Id)
+			serverEvent:FireServer("openCargoTrainVault", trainCar.SystemId, trainCar.Id)
 		elseif isCompleted then
 			return false
 		end
@@ -272,7 +272,7 @@ local function OnCarEntered(trainCar)
 			if currentTime - lastCheckTime > 1 then
 				lastCheckTime = currentTime
 				if trainCar.VaultOpened and (trainCar.Model.Model.Rob.Gold.Position - LocalPlayer.Character.Humanoid.RootPart.Position).Magnitude < 6 then
-					serverEvent:FireServer("qzgb69hv", trainCar.SystemId, trainCar.Id)
+					serverEvent:FireServer("grabCargoTrainGold", trainCar.SystemId, trainCar.Id)
 				end
 			end
 		end)
@@ -284,7 +284,7 @@ local function OnCarExited(trainCar)
 			goldCollectionHeartbeat:Disconnect()
 			goldCollectionHeartbeat = nil
 		end
-		serverEvent:FireServer("qzvcgwi5", trainCar.SystemId, trainCar.Id)
+		serverEvent:FireServer("exitCargoTrain", trainCar.SystemId, trainCar.Id)
 	end
 end
 return {
@@ -296,7 +296,7 @@ return {
 		TrainSystem.Signals.OnCarDestroyed:Connect(OnCarDestroyed)
 		TrainSystem.Signals.OnCarEntered:Connect(OnCarEntered)
 		TrainSystem.Signals.OnCarExited:Connect(OnCarExited)
-		function eventManager.birq5v2d(trainSystemId, carId)
+		function eventManager.openCargoTrainTopDoor(trainSystemId, carId)
 			local trainSystem = TrainSystem.GetSystemById(trainSystemId)
 			local car = TrainSystem.GetCarById(trainSystem, carId)
 			if trainSystem and car then
@@ -331,7 +331,7 @@ return {
 				return nil
 			end
 		end
-		function eventManager.wvsrc40j(trainSystemId, carId)
+		function eventManager.openCargoTrainSideDoor(trainSystemId, carId)
 			local trainSystem = TrainSystem.GetSystemById(trainSystemId)
 			local car = TrainSystem.GetCarById(trainSystem, carId)
 			if trainSystem and car then
@@ -366,7 +366,7 @@ return {
 				return nil
 			end
 		end
-		function eventManager.udhdjqcd(trainSystemId, carId)
+		function eventManager.openCargoTrainVault(trainSystemId, carId)
 			local trainSystem = TrainSystem.GetSystemById(trainSystemId)
 			local car = TrainSystem.GetCarById(trainSystem, carId)
 			if trainSystem and car and OpenVaultDoorRaw(car) then

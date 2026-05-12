@@ -319,7 +319,7 @@ do
 						else
 							v3 = 30
 						end
-						fireServer("pk3nmmvu", v3, "Wire")
+						fireServer("wireDamage", v3, "Wire")
 					end
 				end
 			end
@@ -666,7 +666,7 @@ do
 				t8[p1.name] = p12
 				task.delay(0.25, function()
 					if t9[p1.name] == v1 then
-						fireServer("xyylj5ov", p1.name, p12)
+						fireServer("updateSetting", p1.name, p12)
 					end
 				end)
 			end
@@ -764,7 +764,7 @@ do
 		if p2.Source then
 			p2.Play = true
 			if not p3 then
-				fireServer("i531zmrk", p1, p2)
+				fireServer("updateSoundPlaying", p1, p2)
 			end
 			em.playOrStopWorldSound(LocalPlayer.Name, p1, p2)
 		end
@@ -772,7 +772,7 @@ do
 	StopSound = function(p1, p2)
 		local t3 = {}
 		if not p2 then
-			fireServer("i531zmrk", p1, t3)
+			fireServer("updateSoundPlaying", p1, t3)
 		end
 		em.playOrStopWorldSound(LocalPlayer.Name, p1, t3)
 	end
@@ -882,7 +882,7 @@ require(RS.Game.Party).Init({
 	Fireworks = Fireworks
 })
 local function AttemptArrest(p1)
-	fireServer("iebbtffg", p1)
+	fireServer("attemptArrest", p1)
 end
 function em.showArrestBribedCooldown(p1)
 	if p1.Bribed then
@@ -893,10 +893,10 @@ function em.showArrestBribedCooldown(p1)
 	end
 end
 local function AttemptPickPocket(p1)
-	fireServer("ltawz2m1", p1.Name)
+	fireServer("attemptPickpocket", p1.Name)
 end
 local function AttemptBreakout(p1)
-	fireServer("jfap1ir6", p1.Name)
+	fireServer("finishAttemptBreakout", p1.Name)
 end
 function em.showBreakoutCooldown(p1)
 	if p1.Cooldown then
@@ -914,10 +914,10 @@ local function AttemptTrade(p1)
 	end
 end
 local function AttemptVehicleEject(p1)
-	fireServer("smffotgq", p1)
+	fireServer("attemptVehicleEject", p1)
 end
 local function AttemptVehicleHotwire(p1, p2)
-	fireServer("xtvczbcm", p1, p2)
+	fireServer("attemptVehicleHijack", p1, p2)
 end
 local v24 = nil
 local StartNitro, StopNitro
@@ -927,7 +927,7 @@ do
 	local function CalculateDelta()
 		if v26 and RunUtils.isMainWorld() then
 			v26 = false
-			fireServer("w8pg3yyi", tick() - v25)
+			fireServer("nitroTick", tick() - v25)
 		end
 	end
 	local v27 = tick()
@@ -955,7 +955,7 @@ do
 				for v1, v2 in next, v17.Nitrous do
 					v2.Enabled = true
 				end
-				fireServer("ju0frqe6")
+				fireServer("startNitro")
 				if v28 then
 					v28:Destroy()
 				end
@@ -982,9 +982,9 @@ do
 		end
 		if v26 and RunUtils.isMainWorld() then
 			v26 = false
-			fireServer("w8pg3yyi", tick() - v25)
+			fireServer("nitroTick", tick() - v25)
 		end
-		fireServer("p1h8hvxi")
+		fireServer("stopNitro")
 	end
 	function em.updateNitroUI(p1, p2)
 		if RunUtils.isTradeWorld() then
@@ -1152,7 +1152,7 @@ do
 									v3 = 0
 								end
 								if em.hems then
-									fireServer("mcky1sz1", v2, v3)
+									fireServer("updateCharacterLook", v2, v3)
 								end
 							end
 							debug.profileend()
@@ -1378,7 +1378,7 @@ do
 			if v17 and not v17.Passenger then
 				local Model = v17.Model
 				playHorn(Model:FindFirstChild("BoundingBox"), true, Model:GetAttribute("VehicleHornId"), Model:GetAttribute("VehicleHornLoopable"), nil, (Model:GetAttribute("VehicleHornVolume")))
-				fireServer("ilqf53pr", true)
+				fireServer("toggleHorn", true)
 			end
 		end
 	end
@@ -1388,7 +1388,7 @@ do
 			if _HornSound then
 				_HornSound:Destroy()
 			end
-			fireServer("ilqf53pr", false)
+			fireServer("toggleHorn", false)
 		end
 	end
 	function em.playHornRemote(p1, p2, p3, p4, p5, p6)
@@ -1527,7 +1527,7 @@ do
 					v37 = Humanoid:LoadAnimation(v1)
 					v37:Play()
 					v38 = tick()
-					fireServer("st1ly48j")
+					fireServer("attemptPunch")
 				end
 			end
 		end
@@ -1586,12 +1586,12 @@ do
 				return
 			end
 			VehicleUtils.OnVehicleJumpExited:Fire(v17)
-			fireServer("fag190md")
+			fireServer("exitVehicle")
 			VehicleUtils.LastVehicleExit = tick()
 		else
 			for i, v in ipairs(CartBinder:GetAll()) do
 				if LocalPlayer.Character ~= nil and v:GetOccupant() == LocalPlayer.Character then
-					fireServer("fag190md")
+					fireServer("exitVehicle")
 					break
 				end
 			end
@@ -1886,7 +1886,7 @@ do
 	end
 	local function Buy()
 		if v48 then
-			fireServer("cx3w1u1k", v48)
+			fireServer("purchaseItem", v48)
 		else
 			_Cancel()
 		end
@@ -1894,7 +1894,7 @@ do
 	local function Rent()
 		if v48 then
 			MarketplaceService:PromptProductPurchase(LocalPlayer, 437705749)
-			fireServer("z4pzm1ah", v48)
+			fireServer("rentVehicle", v48)
 		else
 			_Cancel()
 		end
@@ -2127,7 +2127,7 @@ do
 									if v1 and RegionUtils.isPointInPart(v1, Position) then
 										p1.Model:PivotTo(CFrame.new(Position) * v1.CFrame.Rotation)
 									else
-										fireServer("hrm1cr55")
+										fireServer("flipVehicle")
 									end
 								end
 							}))
@@ -2897,7 +2897,7 @@ do
 				p1.AwaitingDoorOpen = true
 				p1.AwaitingDoorClose = false
 			end
-			fireServer("s64v0w4r", p1)
+			fireServer("openDoor", p1)
 		end
 	end
 	local function HasPerm_2(p1, p2, p3, p4)
@@ -3053,7 +3053,7 @@ do
 			Fun = function(p12)
 				if not (tick() - v1 < 1) then
 					v1 = tick()
-					fireServer("sfectvxw", p1)
+					fireServer("itemTouchTrigger", p1)
 				end
 			end
 		}
@@ -3082,7 +3082,7 @@ do
 		local v1 = assert(SewerHatch, "missing SewerHatch")
 		local function Action(p1, p2)
 			if p2 then
-				fireServer("pfnxgk6c", "SewerHatch", v1)
+				fireServer("openSewerHatch", "SewerHatch", v1)
 			end
 			return true
 		end
@@ -3626,10 +3626,10 @@ end
 function em.forwardEventAndDispatch(p1, ...)
 	if p1 == "ems" then
 		task.delay(0.5, function()
-			fireServer("pwe6twnm", p1)
+			fireServer("runAndEchoEvent", p1)
 		end)
 	else
-		fireServer("pwe6twnm", p1)
+		fireServer("runAndEchoEvent", p1)
 	end
 	assert(em[p1], p1)(...)
 end
@@ -3709,7 +3709,7 @@ do
 	end)
 	AttemptVehicleEnter = function(p1)
 		if not v17 then
-			fireServer("unhle4d3", p1.Parent, p1)
+			fireServer("attemptVehicleEnter", p1.Parent, p1)
 		end
 	end
 	function em.showCircleActionNotAllowed()
@@ -4273,7 +4273,7 @@ do
 			local v1 = Players:FindFirstChild(p1.PlayerName)
 			if v1 and not v1:GetAttribute("SentBreakoutRequest") then
 				v1:SetAttribute("SentBreakoutRequest", true)
-				fireServer("x0hczjd5", v1.Name)
+				fireServer("startAttemptBreakout", v1.Name)
 				task.delay(10, function()
 					v1:SetAttribute("SentBreakoutRequest", nil)
 				end)
@@ -4331,9 +4331,9 @@ do
 	local CircleAction_4 = UI.CircleAction
 	local function Action_3(p1, p2)
 		if p2 then
-			fireServer("i63i6a28", p1.Part)
+			fireServer("startSmallStoreRob", p1.Part)
 		else
-			fireServer("k2mkzo66", p1.Part)
+			fireServer("finishSmallStoreRob", p1.Part)
 		end
 		return true
 	end
@@ -4415,7 +4415,7 @@ do
 	LocalPlayer.CharacterAdded:Connect(CharacterAdded)
 	local v100 = Instance.new("BindableEvent")
 	v100.Event:Connect(function()
-		fireServer("ylsktsxo")
+		fireServer("resetPlayer")
 	end)
 	task.delay(2, function()
 		local v1, v2 = pcall(function()
@@ -4467,7 +4467,7 @@ do
 							v103 = 0
 							if not v101 then
 								v101 = true
-								fireServer("ec0h8krx", "NoClip StrafingNoPhysics", false)
+								fireServer("anticheatReport", "NoClip StrafingNoPhysics", false)
 							end
 						end
 					end
@@ -4484,7 +4484,7 @@ do
 			LocalPlayer:WaitForChild("Backpack", 20).ChildAdded:Connect(function(p1)
 				if p1:IsA("BackpackItem") and not v101 then
 					v101 = true
-					fireServer("ec0h8krx", "BackpackTool", false)
+					fireServer("anticheatReport", "BackpackTool", false)
 				end
 			end)
 		end)
@@ -4570,7 +4570,7 @@ do
 					end
 					if v1 then
 						v101 = true
-						fireServer("ec0h8krx", v2, false)
+						fireServer("anticheatReport", v2, false)
 					end
 				end
 			end
@@ -4580,7 +4580,7 @@ do
 		local v1, _ = pcall(CheatCheck)
 		if not v1 then
 			v101 = true
-			fireServer("ec0h8krx", "FailedPcall", false)
+			fireServer("anticheatReport", "FailedPcall", false)
 		end
 	end)
 end

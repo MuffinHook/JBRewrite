@@ -29,7 +29,7 @@ local function AddedJewel(jewelPart)
 		Dist = 8,
 		Callback = function(part, isActive)
 			if isActive then
-				jewelEvent:FireServer("kvrm5wlx", jewelPart.Name)
+				jewelEvent:FireServer("jewelryStoreEvent", jewelPart.Name)
 				Audio.ObjectLocal(LocalPlayer.PlayerGui, 6875006205, {
 					Volume = 0.4
 				})
@@ -45,7 +45,7 @@ local function AddedLaserButton(laserPart)
 		Dist = 8,
 		Callback = function(part, isActive)
 			if isActive then
-				jewelEvent:FireServer("kvrm5wlx", "LaserButton")
+				jewelEvent:FireServer("jewelryStoreEvent", "LaserButton")
 			end
 			return true
 		end

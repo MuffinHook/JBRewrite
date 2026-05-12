@@ -192,7 +192,7 @@ function TeamChooseUI.Show(shouldSkipFade)
 		else
 			isPlaying = true
 			screenFade:FadeToLinear(0, 0.3)
-			jumpEvent:FireServer("c49ti5bx", selectedTeam)
+			jumpEvent:FireServer("switchTeam", selectedTeam)
 			Maid:GiveTask(task.delay(2, function()
 				screenFade:Set(1)
 				isPlaying = false

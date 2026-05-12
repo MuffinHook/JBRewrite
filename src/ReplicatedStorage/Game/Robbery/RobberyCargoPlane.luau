@@ -191,7 +191,7 @@ function CargoPlane.new(bornAt)
 		task.delay(0.1, function()
 			planeModel.ControlPanel.Light.Color = Color3.fromRGB(196, 40, 28)
 		end)
-		RemoteEvent:FireServer("wpn1ghxm")
+		RemoteEvent:FireServer("cargoPlanePullLever")
 	end)
 	self.Lever.OnFail:Connect(function()
 		eventManager.ShowNotification({
@@ -331,7 +331,7 @@ function CargoPlane.SetupHatch(self)
 					TimePosition = 1,
 					MaxPlaybackTime = 0.6
 				})
-				RemoteEvent:FireServer("u246rrbe")
+				RemoteEvent:FireServer("cargoPlaneOpenHatch")
 			end
 			return true
 		else
@@ -391,7 +391,7 @@ function CargoPlane.EnableCrates(self)
 	self.CratesEnabled = true
 	local function Action(actionSpec, completed)
 		if completed then
-			RemoteEvent:FireServer("x4dtvc4o", actionSpec.Part.Parent.Name)
+			RemoteEvent:FireServer("cargoPlaneGrabCrate", actionSpec.Part.Parent.Name)
 		end
 		return true
 	end

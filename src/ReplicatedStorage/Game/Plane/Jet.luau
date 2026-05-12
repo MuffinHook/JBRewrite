@@ -199,7 +199,7 @@ local function AttemptLaunchLocalMissile(jet, seat)
 
 	attemptSetSightColor(jet, Color3.fromRGB(0, 255, 0))
 
-	eventRemote:FireServer("usqlew42", obj)
+	eventRemote:FireServer("launchJetMissle", obj)
 
 	return true
 end
@@ -224,7 +224,7 @@ local function OpenMissileBuy(jet)
 	))
 
 	confirmation.Maid:GiveTask(confirmation.OnYes:Connect(function()
-		eventRemote:FireServer("qp3y3th9")
+		eventRemote:FireServer("buyJetMissles")
 	end))
 
 	confirmation.Maid:GiveTask(function()

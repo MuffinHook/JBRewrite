@@ -131,7 +131,7 @@ local function Parachute()
 	if not RawParachute() then
 		return false
 	end
-	remoteEvent:FireServer("g8qmqdsf")
+	remoteEvent:FireServer("openParachute")
 end
 stopParachuteCallback = function()
 	local stopSucceeded
@@ -149,7 +149,7 @@ stopParachuteCallback = function()
 	if not stopSucceeded then
 		return false
 	end
-	remoteEvent:FireServer("qa93zuem")
+	remoteEvent:FireServer("closeParachute")
 end
 local function UpdateGlider()
 	local HumanoidRootPart = currentFlightState.HumanoidRootPart
@@ -227,25 +227,25 @@ local function Glider()
 	if not RawGlider() then
 		return false
 	end
-	remoteEvent:FireServer("d6lhurm4")
+	remoteEvent:FireServer("openGlider")
 end
 stopGliderCallback = function()
 	if not RawGliderStop() then
 		return false
 	end
-	remoteEvent:FireServer("mc6ascx8")
+	remoteEvent:FireServer("closeGlider")
 end
 return {
 	Init = function(initConfig)
 		local em = initConfig.em
 		remoteEvent = initConfig.Event
 		eventManager = em
-		function em.g8qmqdsf()
+		function em.openParachute()
 			if not RawParachute() then
-				remoteEvent:FireServer("qa93zuem")
+				remoteEvent:FireServer("closeParachute")
 			end
 		end
-		function em.qa93zuem()
+		function em.closeParachute()
 			if currentFlightState then
 				if currentFlightState.Type == "Parachute" then
 					currentFlightState.Gyro:Destroy()
@@ -257,12 +257,12 @@ return {
 				end
 			end
 		end
-		function em.d6lhurm4()
+		function em.openGlider()
 			if not RawGlider() then
-				remoteEvent:FireServer("mc6ascx8")
+				remoteEvent:FireServer("closeGlider")
 			end
 		end
-		function em.mc6ascx8()
+		function em.closeGlider()
 			RawGliderStop()
 		end
 		require(script.Parent.DefaultActions).onJumpPressed:Connect(function()

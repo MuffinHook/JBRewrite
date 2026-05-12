@@ -46,7 +46,7 @@ function Sword.SwingLunge(swordInstance)
 		swordInstance.SpringItemOffset:Accelerate(Vector3.new(0, 0, -30))
 		if swordInstance.Local then
 			CharacterUtil.WalkSpeedSpring:Accelerate(35)
-			EventRemote:FireServer("m6rmpdf6", 2)
+			EventRemote:FireServer("swingBatonOrSword", 2)
 		end
 	end)
 	task.delay(0.45, function()
@@ -65,7 +65,7 @@ function Sword.SwingSwoosh(swordInstance)
 	swordInstance.SpringNeckRotation:Accelerate(Vector3.new(1.2566371, -math.pi, 0))
 	swordInstance.TrailLengthTime = 0.1
 	if swordInstance.Local then
-		EventRemote:FireServer("m6rmpdf6", 1)
+		EventRemote:FireServer("swingBatonOrSword", 1)
 	end
 end
 function Sword.Stepped(swordInstance)

@@ -14,6 +14,9 @@
     "ServerScriptService": {
       "$path": "src/ServerScriptService"
     },
+    "ServerStorage": {
+      "$path": "src/ServerStorage"
+    },
     "SoundService": {
       "$properties": {
         "RespectFilteringEnabled": true,

@@ -51,7 +51,7 @@ local function SetupPassengerCar(carData)
 	local function GrabAction(actionSpec, isLocalPlayer)
 		if isLocalPlayer then
 			actionSpec.IsMine = true
-			RemoteEvent:FireServer("no98ghkm", carData.SystemId, carData.Id, actionSpec.SpawnName, actionSpec.ItemName)
+			RemoteEvent:FireServer("grabPassengerTrainCash", carData.SystemId, carData.Id, actionSpec.SpawnName, actionSpec.ItemName)
 		end
 		return true
 	end
@@ -104,7 +104,7 @@ local function SetupPassengerCar(carData)
 	if carData.Name ~= "PassengerArmor" then
 		local function Action(actionSpec, isLocalPlayer)
 			if isLocalPlayer and OpenRoofDoorRaw(carData, actionSpec.GlassIndex) then
-				RemoteEvent:FireServer("i1slqzvb", carData.SystemId, carData.Id, actionSpec.GlassIndex)
+				RemoteEvent:FireServer("breakPassengerGlass", carData.SystemId, carData.Id, actionSpec.GlassIndex)
 			elseif isLocalPlayer then
 				return false
 			end
@@ -142,7 +142,7 @@ local function SetupPassengerCar(carData)
 				doorOpened = true
 			end
 			if doorOpened then
-				RemoteEvent:FireServer("rxlsks9y", carData.SystemId, carData.Id, actionSpec.DoorIndex)
+				RemoteEvent:FireServer("openPassengerDoor", carData.SystemId, carData.Id, actionSpec.DoorIndex)
 			else
 				return false
 			end
@@ -197,7 +197,7 @@ return {
 		ScreenGui = config.ScreenGui
 		TrainSystem.Signals.OnCarCreated:Connect(OnCarCreated)
 		TrainSystem.Signals.OnCarDestroyed:Connect(OnCarDestroyed)
-		function em.no98ghkm(systemId, carId, spawnName)
+		function em.grabPassengerTrainCash(systemId, carId, spawnName)
 			local systemData = TrainSystem.GetSystemById(systemId)
 			if systemData then
 				local carData = TrainSystem.GetCarById(systemData, carId)
@@ -222,7 +222,7 @@ return {
 				return nil
 			end
 		end
-		function em.i1slqzvb(systemId, carId, glassIndex)
+		function em.breakPassengerGlass(systemId, carId, glassIndex)
 			local systemData = TrainSystem.GetSystemById(systemId)
 			if systemData then
 				local carData = TrainSystem.GetCarById(systemData, carId)

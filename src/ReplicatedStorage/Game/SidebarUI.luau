@@ -61,7 +61,7 @@ function t.Init(initConfig)
 						teamSwitchConfirmation = Confirmation.new("Are you sure you want to switch teams?")
 						teamSwitchConfirmation.OnYes:Connect(function()
 							teamSwitchConfirmation = nil
-							switchTeamEvent:FireServer("lfu6g4s2")
+							switchTeamEvent:FireServer("switchTeams")
 						end)
 						teamSwitchConfirmation.OnNo:Connect(function()
 							teamSwitchConfirmation = nil

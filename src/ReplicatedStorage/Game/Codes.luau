@@ -54,7 +54,7 @@ return {
 				return false
 			end
 			CodesGui.CodeContainer.Background.CodeContainer.Code.Text = ""
-			codeEvent:FireServer("khwitohx", Text)
+			codeEvent:FireServer("enterCode", Text)
 			AlexWM.WindowClose(codesWindow)
 		end
 		CodesGui.CodeContainer.Background.Redeem.MouseButton1Down:Connect(Submit)

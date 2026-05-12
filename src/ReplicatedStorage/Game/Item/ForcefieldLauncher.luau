@@ -72,7 +72,7 @@ function ForcefieldInstance.AttemptLaunch(forcefield, targetPosition, projectile
 				local forcefieldId = String.base85UUID(10)
 				local serverTime = workspace:GetServerTimeNow()
 				forcefield:Grow(shellPosition, forcefieldId, serverTime)
-				eventSignal:FireServer("oy0cfqfm", shellPosition, forcefieldId, serverTime)
+				eventSignal:FireServer("spawnForcefield", shellPosition, forcefieldId, serverTime)
 			end
 		end)
 		return true
@@ -184,7 +184,7 @@ ForcefieldLauncherClass.__index = ForcefieldLauncherClass
 setmetatable(ForcefieldLauncherClass, Item)
 function ForcefieldLauncherClass.Init(itemConfig)
 	eventSignal = itemConfig.Event
-	function itemConfig.em.oy0cfqfm(self, position, forcefieldId, spawnTime)
+	function itemConfig.em.spawnForcefield(self, position, forcefieldId, spawnTime)
 		assert(self)
 		assert(position)
 		ForcefieldInstance.new():Grow(position, forcefieldId, spawnTime)

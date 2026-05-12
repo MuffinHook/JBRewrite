@@ -349,13 +349,13 @@ return {
 		eventConnection = config.Event
 		eventManager = em
 		function flowState.OnConnection()
-			eventConnection:FireServer("vrase4bd", flowState.FlowId, flowState.Grid)
+			eventConnection:FireServer("sendPlantGrid", flowState.FlowId, flowState.Grid)
 		end
-		function em.boy25zu9(flowId, grid)
+		function em.updatePlantGrid(flowId, grid)
 			flowState:SetGrid(flowId, grid)
 			flowState:Show()
 		end
-		function em.a5lmmwfi(idToHide)
+		function em.resetPlantGrid(idToHide)
 			if flowState.IsOpen and (idToHide == nil or flowState.FlowId == idToHide) then
 				flowState:Reset()
 				flowState:Hide()

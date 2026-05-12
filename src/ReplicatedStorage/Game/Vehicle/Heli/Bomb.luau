@@ -79,10 +79,10 @@ function t.Explode(bombInstance, explosionPosition)
 					RootPart.Velocity = RootPart.Velocity + distanceVector.Unit * damageFalloff * 30
 					if bombInstance._owner then
 						print(bombInstance._owner)
-						eventRemote:FireServer("x941csnt", damageFalloff * 50, bombInstance._owner, "Bomb")
+						eventRemote:FireServer("explosionDamage", damageFalloff * 50, bombInstance._owner, "Bomb")
 						return
 					end
-					eventRemote:FireServer("xe6v1us6", damageFalloff * 50, "Explode")
+					eventRemote:FireServer("enviornmentDamage", damageFalloff * 50, "Explode")
 				end
 			end
 		end

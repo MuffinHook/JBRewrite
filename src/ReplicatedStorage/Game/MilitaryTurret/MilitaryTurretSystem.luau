@@ -4,7 +4,7 @@ return {
 		local event = gameServices.Event
 		MilitaryTurretBinder:GetClassAddedSignal():Connect(function(turretInstance)
 			turretInstance._maid:GiveTask(turretInstance.onBulletHit:Connect(function(bulletData)
-				event:FireServer("xe6v1us6", bulletData, "Shot")
+				event:FireServer("enviornmentDamage", bulletData, "Shot")
 			end))
 		end)
 		MilitaryTurretBinder:Start()

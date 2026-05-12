@@ -164,7 +164,7 @@ return {
 				Dist = 8,
 				Callback = function(activatedByUser, isActive)
 					if isActive then
-						bankEventSignal:FireServer("b0sb3ppj", doorPart)
+						bankEventSignal:FireServer("bankPlaceDynamite", doorPart)
 					end
 					return true
 				end

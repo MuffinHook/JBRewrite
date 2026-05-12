@@ -197,7 +197,7 @@ local function StartRagdolling(duration)
 			ragdollStartTime = tick()
 			AlexRagdoll.Ragdoll(humanoid.Parent)
 			OnRagdolled:Fire()
-			remoteEvent:FireServer("lbwt9cvb")
+			remoteEvent:FireServer("startRagdoll")
 			return true
 		end
 		return false
@@ -228,7 +228,7 @@ local function StopFalling(landY)
 			local Character = LocalPlayer.Character
 			local rootPart = if Character then Character.PrimaryPart else nil
 			if rootPart and not TagUtils.isPointInTag(rootPart.Position, "NoFallDamage") then
-				remoteEvent:FireServer("u2wi63hk", fallDistance)
+				remoteEvent:FireServer("fallDamage", fallDistance)
 			end
 		end
 	end
@@ -333,7 +333,7 @@ local function Heartbeat()
 	end
 	if isRagdolling == true and (ragdollTimerFired == false and ragdollDuration < now - ragdollStartTime) then
 		ragdollTimerFired = true
-		remoteEvent:FireServer("swwmr1tz")
+		remoteEvent:FireServer("endRagdoll")
 	end
 end
 local function AttemptUseParachute()
@@ -366,7 +366,7 @@ return {
 		fallingGui = ReplicatedStorage.StarterGui:FindFirstChild("FallingGui")
 		fallingGui.Parent = LocalPlayer.PlayerGui
 		JetPack = require(ReplicatedStorage.Game.JetPack.JetPack)
-		function em.swwmr1tz(shouldUnragdoll)
+		function em.unragdollPlayer(shouldUnragdoll)
 			if shouldUnragdoll then
 				local Character = LocalPlayer.Character
 				local humanoid = if Character == nil then nil else Character:FindFirstChild("Humanoid")

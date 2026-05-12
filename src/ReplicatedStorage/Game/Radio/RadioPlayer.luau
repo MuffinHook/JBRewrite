@@ -39,7 +39,7 @@ function t.Init(initConfig)
 	end)
 	t.OnPlaylistUpdated:Connect(function(playlistUpdate)
 		if playlistUpdate.Persist then
-			radioEvent:FireServer("hwmsi3z1", playlistUpdate.Title, playlistUpdate.Songs)
+			radioEvent:FireServer("updateRadioPlaylist", playlistUpdate.Title, playlistUpdate.Songs)
 		end
 	end)
 	function initConfig.em.gc0vlr85(playlistsTable)
@@ -68,7 +68,7 @@ function t.PlayId(soundId, timePosition, isThirdPerson)
 		sound = vehiclePacket.RadioSound
 		assert(sound)
 		sound.Volume = 0
-		radioEvent:FireServer("hmkuod8p", soundId, timePosition)
+		radioEvent:FireServer("playRadioSong", soundId, timePosition)
 	else
 		local audioObject = Audio.ObjectLocal(LocalPlayer, soundId, {
 			DoNotPlay = true,
@@ -147,7 +147,7 @@ function t.Stop()
 		local CurrentSound = t.CurrentSound
 		t.CurrentSound = nil
 		if CurrentSound:IsDescendantOf(workspace) then
-			radioEvent:FireServer("y983xui6")
+			radioEvent:FireServer("stopRadioSong")
 		else
 			Audio.FadeTo(CurrentSound, 0, 1, function()
 				CurrentSound:Destroy()

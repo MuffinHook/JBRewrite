@@ -129,7 +129,7 @@ function TombRobberySystem.setupSpikes()
 				if currentSpikeHitTime - lastLocalSpikeHitTime > 1 and currentSpikeHitTime - lastGlobalSpikeHitTime > 0.5 then
 					lastLocalSpikeHitTime = currentSpikeHitTime
 					lastGlobalSpikeHitTime = currentSpikeHitTime
-					tombRemoteEvent:FireServer("xe6v1us6", 36, "Spikes")
+					tombRemoteEvent:FireServer("enviornmentDamage", 36, "Spikes")
 				end
 			end
 		end)
@@ -235,7 +235,7 @@ function TombRobberySystem.setupWood()
 				end
 				lastWoodTouchTime = currentTouchTime
 				if TombRobberySystem._duckTrack and not TombRobberySystem._duckTrack.IsPlaying then
-					tombRemoteEvent:FireServer("xe6v1us6", 30, "Duck")
+					tombRemoteEvent:FireServer("enviornmentDamage", 30, "Duck")
 					Audio.ObjectLocal(woodModel, 6875020869, {
 						Volume = 0.6,
 						RollOffMaxDistance = 64

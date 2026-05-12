@@ -97,7 +97,7 @@ return {
 				if hitPlayer == LocalPlayer then
 					local playerHome = self:GetHome()
 					if not (playerHome and playerHome:HasPermissionToEnter(hitPlayer)) then
-						eventRemote:FireServer("xe6v1us6", 3, "Shot")
+						eventRemote:FireServer("enviornmentDamage", 3, "Shot")
 					end
 				end
 				Audio.ObjectLocal(hitPart.RootPart, soundIds.bullet_impact_bass, {

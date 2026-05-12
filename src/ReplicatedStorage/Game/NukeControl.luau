@@ -126,7 +126,7 @@ return {
 					end)
 					local shockwave = Shockwave.new(nukeConfig.Nuke.Target, nukeConfig.Shockwave)
 					shockwave.OnPastLocalPlayer:Connect(function()
-						NukeEvent:FireServer("jl1hp8am")
+						NukeEvent:FireServer("nukeCarExplode")
 						local vehiclePacket = VehicleUtils.GetLocalVehiclePacket()
 						if vehiclePacket ~= nil then
 							if vehiclePacket.Make == "AdminNuke" and not vehiclePacket.Passenger then
@@ -177,7 +177,7 @@ return {
 		end
 		local function Action(actionState, shouldLaunch)
 			if shouldLaunch then
-				NukeEvent:FireServer("zmdiwclj")
+				NukeEvent:FireServer("nukeLaunch")
 				return true
 			end
 		end
